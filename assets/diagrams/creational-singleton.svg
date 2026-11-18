@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-labelledby="title">
+  <title id="title">One explicitly owned process resource</title>
+  <rect width="320" height="180" fill="#f8fafc"/>
+  <rect x="105" y="18" width="110" height="38" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="160" y="42" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#0f172a">Composition root</text>
+  <path d="M160 56v32" stroke="#2563eb" stroke-width="2"/>
+  <rect x="118" y="88" width="84" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="160" y="109" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#334155">One pool</text>
+  <path d="M118 105H58v30m144-30h60v30m-102-13v13" stroke="#94a3b8" fill="none"/>
+  <g fill="#fff" stroke="#94a3b8"><rect x="26" y="135" width="64" height="26" rx="4"/><rect x="128" y="135" width="64" height="26" rx="4"/><rect x="230" y="135" width="64" height="26" rx="4"/></g>
+  <g fill="#334155" font-family="system-ui,sans-serif" font-size="9" text-anchor="middle"><text x="58" y="152">Handler A</text><text x="160" y="152">Handler B</text><text x="262" y="152">Worker</text></g>
+</svg>

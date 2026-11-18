@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-labelledby="title">
+  <title id="title">Command carries intent through a stable workflow template</title>
+  <rect width="320" height="180" fill="#f8fafc"/>
+  <rect x="18" y="66" width="72" height="48" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="54" y="86" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" font-weight="600" fill="#0f172a">Command</text>
+  <text x="54" y="101" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="#334155">intent + id</text>
+  <path d="M90 90h26" stroke="#64748b"/>
+  <rect x="116" y="30" width="186" height="120" rx="8" fill="#fff" stroke="#94a3b8"/>
+  <text x="209" y="51" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" font-weight="600" fill="#0f172a">Workflow template</text>
+  <g fill="#fff" stroke="#2563eb"><rect x="132" y="68" width="34" height="34" rx="4"/><rect x="174" y="68" width="34" height="34" rx="4"/><rect x="216" y="68" width="34" height="34" rx="4"/><rect x="258" y="68" width="28" height="34" rx="4"/></g>
+  <g fill="#334155" font-family="system-ui,sans-serif" font-size="8" text-anchor="middle"><text x="149" y="88">parse</text><text x="191" y="88">check</text><text x="233" y="88">save</text><text x="272" y="88">emit</text></g>
+  <path d="M166 85h8m34 0h8m34 0h8" stroke="#64748b"/>
+  <text x="209" y="128" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="#64748b">fixed order · variable steps</text>
+</svg>

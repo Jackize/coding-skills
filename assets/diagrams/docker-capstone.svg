@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" role="img" aria-labelledby="title desc">
+  <title id="title">Capstone delivery loop</title>
+  <desc id="desc">Source builds an image used by migration and API services connected to a persistent database and release evidence.</desc>
+  <rect width="320" height="180" fill="#f8fafc"/>
+  <g font-family="system-ui,sans-serif" text-anchor="middle">
+    <rect x="12" y="18" width="62" height="34" rx="5" fill="#fff" stroke="#94a3b8"/>
+    <text x="43" y="39" font-size="9" fill="#334155">Source</text>
+    <rect x="102" y="18" width="70" height="34" rx="5" fill="#dbeafe" stroke="#2563eb"/>
+    <text x="137" y="39" font-size="9" font-weight="600" fill="#1e3a8a">Image digest</text>
+    <rect x="102" y="74" width="70" height="34" rx="5" fill="#fff" stroke="#2563eb"/>
+    <text x="137" y="95" font-size="9" fill="#0f172a">Migration</text>
+    <rect x="220" y="74" width="70" height="34" rx="5" fill="#fff" stroke="#2563eb"/>
+    <text x="255" y="95" font-size="9" fill="#0f172a">API + health</text>
+    <ellipse cx="137" cy="145" rx="47" ry="14" fill="#93c5fd" stroke="#2563eb"/>
+    <text x="137" y="148" font-size="9" font-weight="600" fill="#1e3a8a">persistent database</text>
+    <rect x="220" y="128" width="70" height="34" rx="5" fill="#eff6ff" stroke="#2563eb"/>
+    <text x="255" y="145" font-size="8" fill="#1e3a8a">backup + restore</text>
+    <text x="255" y="156" font-size="8" fill="#1e40af">release evidence</text>
+  </g>
+  <g stroke="#2563eb" stroke-width="2" fill="#2563eb">
+    <path d="M74 35h22"/><path d="m91 29 10 6-10 6z"/>
+    <path d="M137 52v16"/><path d="m131 63 6 10 6-10z"/>
+    <path d="M172 35h83v33"/><path d="m249 63 6 10 6-10z"/>
+    <path d="M137 108v17"/><path d="m131 120 6 10 6-10z"/>
+    <path d="M220 91h-42v44h-2"/><path d="m181 129-10 6 10 6z"/>
+    <path d="M184 145h30"/><path d="m209 139 10 6-10 6z"/>
+  </g>
+</svg>

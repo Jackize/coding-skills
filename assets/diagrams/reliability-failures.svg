@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" role="img" aria-labelledby="title">
+  <title id="title">Bounded retries and idempotency across failure domains</title>
+  <rect width="320" height="180" fill="#f8fafc"/>
+  <rect x="22" y="58" width="76" height="64" rx="7" fill="#fff" stroke="#94a3b8"/>
+  <rect x="122" y="58" width="76" height="64" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/>
+  <rect x="222" y="58" width="76" height="64" rx="7" fill="#fff" stroke="#94a3b8"/>
+  <path d="M98 80h24M122 102H98M198 80h24M222 102h-24" stroke="#2563eb" stroke-width="2"/>
+  <path d="M105 38c28-20 82-20 110 0" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="5 4"/>
+  <g font-family="system-ui,sans-serif" font-size="10" text-anchor="middle" fill="#1e3a8a">
+    <text x="60" y="84">caller</text><text x="60" y="101">deadline</text><text x="160" y="84">idempotency</text><text x="160" y="101">record</text><text x="260" y="84">provider</text><text x="260" y="101">effect</text><text x="160" y="26">bounded retry</text>
+  </g>
+</svg>

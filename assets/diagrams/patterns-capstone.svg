@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-labelledby="title">
+  <title id="title">Capstone review checklist</title>
+  <rect width="320" height="180" fill="#f8fafc"/>
+  <rect x="62" y="18" width="196" height="146" rx="8" fill="#fff" stroke="#94a3b8"/>
+  <text x="160" y="42" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#0f172a">Pattern review</text>
+  <g fill="none" stroke="#2563eb" stroke-width="2"><rect x="84" y="56" width="14" height="14" rx="2"/><path d="m87 63 4 4 8-10"/><rect x="84" y="79" width="14" height="14" rx="2"/><path d="m87 86 4 4 8-10"/><rect x="84" y="102" width="14" height="14" rx="2"/><path d="m87 109 4 4 8-10"/><rect x="84" y="125" width="14" height="14" rx="2"/><path d="m87 132 4 4 8-10"/></g>
+  <g fill="#334155" font-family="system-ui,sans-serif" font-size="10"><text x="110" y="67">Force and contract</text><text x="110" y="90">Owner and lifetime</text><text x="110" y="113">Failure evidence</text><text x="110" y="136">Removal path</text></g>
+  <circle cx="252" cy="145" r="20" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <path d="m243 145 6 6 12-14" fill="none" stroke="#2563eb" stroke-width="3"/>
+</svg>

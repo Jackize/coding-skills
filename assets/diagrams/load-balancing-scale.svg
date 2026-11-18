@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" role="img" aria-labelledby="title">
+  <title id="title">Load balancer distributing traffic across healthy instances</title>
+  <rect width="320" height="180" fill="#f8fafc"/>
+  <circle cx="38" cy="90" r="18" fill="#fff" stroke="#94a3b8"/>
+  <rect x="105" y="62" width="80" height="56" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/>
+  <path d="M56 90h49M185 90h35M220 90V38M220 90v52M220 38h28M220 90h28M220 142h28" stroke="#2563eb" stroke-width="2" fill="none"/>
+  <g fill="#fff" stroke="#94a3b8"><rect x="248" y="24" width="54" height="28" rx="4"/><rect x="248" y="76" width="54" height="28" rx="4"/><rect x="248" y="128" width="54" height="28" rx="4"/></g>
+  <g font-family="system-ui,sans-serif" font-size="10" text-anchor="middle" fill="#1e3a8a">
+    <text x="38" y="94">traffic</text><text x="145" y="94">balancer</text><text x="275" y="42">zone A</text><text x="275" y="94">zone B</text><text x="275" y="146">zone C</text>
+  </g>
+</svg>

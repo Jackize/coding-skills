@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" role="img" aria-labelledby="title desc">
+  <title id="title">Build context and multi-stage artifact flow</title>
+  <desc id="desc">A filtered build context enters a builder and only selected artifacts enter the runtime image.</desc>
+  <rect width="320" height="180" fill="#f8fafc"/>
+  <g font-family="system-ui,sans-serif" text-anchor="middle">
+    <rect x="12" y="48" width="76" height="84" rx="6" fill="#fff" stroke="#94a3b8"/>
+    <text x="50" y="70" font-size="11" font-weight="600" fill="#0f172a">Context</text>
+    <text x="50" y="90" font-size="9" fill="#475569">source</text>
+    <text x="50" y="106" font-size="9" fill="#475569">lockfile</text>
+    <text x="50" y="122" font-size="9" fill="#94a3b8">ignored files ×</text>
+    <rect x="122" y="32" width="84" height="116" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="164" y="56" font-size="11" font-weight="600" fill="#1e3a8a">Build stage</text>
+    <text x="164" y="82" font-size="9" fill="#1e40af">dependencies</text>
+    <text x="164" y="100" font-size="9" fill="#1e40af">compiler</text>
+    <text x="164" y="124" font-size="10" font-weight="600" fill="#1e3a8a">dist/</text>
+    <rect x="240" y="56" width="68" height="68" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="274" y="81" font-size="11" font-weight="600" fill="#0f172a">Runtime</text>
+    <text x="274" y="103" font-size="9" fill="#475569">dist only</text>
+  </g>
+  <g stroke="#2563eb" stroke-width="2" fill="#2563eb">
+    <path d="M88 90h28"/><path d="m111 84 10 6-10 6z"/>
+    <path d="M206 90h28"/><path d="m229 84 10 6-10 6z"/>
+  </g>
+  <text x="222" y="78" text-anchor="middle" font-family="system-ui,sans-serif" font-size="8" fill="#2563eb">COPY --from</text>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" role="img" aria-labelledby="title desc">
+  <title id="title">Dockerfile instructions produce image layers</title>
+  <desc id="desc">A Dockerfile flows into a stack of reusable image layers and runtime metadata.</desc>
+  <rect width="320" height="180" fill="#f8fafc"/>
+  <rect x="16" y="30" width="92" height="120" rx="6" fill="#fff" stroke="#94a3b8"/>
+  <text x="62" y="51" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#0f172a">Dockerfile</text>
+  <g font-family="ui-monospace,monospace" font-size="9" fill="#475569">
+    <text x="28" y="75">FROM node</text><text x="28" y="94">COPY lock</text>
+    <text x="28" y="113">RUN install</text><text x="28" y="132">COPY src</text>
+  </g>
+  <path d="M116 90h42" stroke="#2563eb" stroke-width="2"/>
+  <path d="m153 84 10 6-10 6z" fill="#2563eb"/>
+  <g stroke="#2563eb" stroke-width="1.5">
+    <rect x="174" y="30" width="128" height="28" rx="4" fill="#eff6ff"/>
+    <rect x="174" y="62" width="128" height="28" rx="4" fill="#dbeafe"/>
+    <rect x="174" y="94" width="128" height="28" rx="4" fill="#bfdbfe"/>
+    <rect x="174" y="126" width="128" height="28" rx="4" fill="#93c5fd"/>
+  </g>
+  <g font-family="system-ui,sans-serif" font-size="10" fill="#1e3a8a" text-anchor="middle">
+    <text x="238" y="48">runtime metadata</text><text x="238" y="80">source layer</text>
+    <text x="238" y="112">dependency layer</text><text x="238" y="144">base layer</text>
+  </g>
+</svg>
