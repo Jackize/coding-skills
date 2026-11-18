@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img">
+  <title>Container layers</title>
+  <rect width="320" height="180" fill="#f7f7f5"/>
+  <rect x="90" y="120" width="140" height="28" rx="3" fill="#fff" stroke="#d4d4d0"/>
+  <rect x="90" y="88" width="140" height="28" rx="3" fill="#fff" stroke="#d4d4d0"/>
+  <rect x="90" y="56" width="140" height="28" rx="3" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <rect x="90" y="24" width="140" height="28" rx="3" fill="#fff" stroke="#d4d4d0"/>
+  <text x="160" y="42" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" fill="#1a1a1a">app code</text>
+  <text x="160" y="74" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" fill="#1a1a1a">runtime</text>
+  <text x="160" y="106" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" fill="#1a1a1a">packages</text>
+  <text x="160" y="138" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" fill="#1a1a1a">base OS</text>
+</svg>

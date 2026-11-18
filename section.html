@@ -10,10 +10,16 @@
   <header id="site-header" class="site-header">
     <div class="site-header__inner">
       <a class="site-brand" href="index.html">Coding Skills</a>
-      <div class="lang-toggle" role="group" aria-label="Language">
-        <button type="button" class="lang-toggle__btn" data-lang="en">EN</button>
-        <span class="lang-toggle__sep" aria-hidden="true">|</span>
-        <button type="button" class="lang-toggle__btn" data-lang="vn">VN</button>
+      <div class="header-actions">
+        <div id="section-actions" class="export-actions" hidden>
+          <button type="button" id="download-md" class="btn-export">Download Markdown</button>
+          <button type="button" id="download-html" class="btn-export">Download HTML</button>
+        </div>
+        <div class="lang-toggle" role="group" aria-label="Language">
+          <button type="button" class="lang-toggle__btn" data-lang="en">EN</button>
+          <span class="lang-toggle__sep" aria-hidden="true">|</span>
+          <button type="button" class="lang-toggle__btn" data-lang="vn">VN</button>
+        </div>
       </div>
     </div>
   </header>
@@ -30,5 +36,6 @@
       <p class="site-footer__copy">Coding Skills — sample learning docs.</p>
     </div>
   </footer>
+  <script type="module" src="js/app-section.js"></script>
 </body>
 </html>
