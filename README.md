@@ -4,15 +4,11 @@ Bilingual (EN/VN) mid-level learning site for Design Patterns, System Design, an
 
 ## Curriculum
 
-Each course is a full progression (~8–10 sections). Every section follows the same document template:
+Each course is a full progression (~8–10+ sections). Bodies are scannable for developers (lists, **bold** terms, short paragraphs). Every section uses this heading ladder:
 
-1. Why this matters  
-2. Mental model (+ diagram)  
-3. Walkthrough  
-4. Pitfalls & trade-offs  
-5. Practice / exercises  
+Analysis → Requirements → Features → Tech choices → Design → Code → Deploy → Trade-offs → Failure modes → Practice  
 
-Plus **Baseline** and **Skills gained** on the section page. Content lives in `js/content/*.js` and is assembled by `js/catalog.js`.
+Plus **Baseline** and **Skills gained** on the section page. Style guide: keep content mid-level and concrete. Content lives in `js/content/*.js`, assembled by `js/catalog.js`.
 
 | Course id | Focus |
 | --- | --- |

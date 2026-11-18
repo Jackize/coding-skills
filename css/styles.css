@@ -238,6 +238,43 @@ body {
   font-size: 0.95em;
 }
 
+.section-docs strong {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.section-docs em {
+  font-style: italic;
+  color: var(--color-text);
+}
+
+.section-docs ul,
+.section-docs ol {
+  padding-left: 1.25rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.section-docs li {
+  margin: 0.25rem 0;
+}
+
+.section-docs li > ul,
+.section-docs li > ol {
+  margin: 0.25rem 0 0.5rem;
+}
+
+.section-docs h2 {
+  margin-top: 1.75rem;
+  font-size: 1.2rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.25rem;
+}
+
+.section-docs h3 {
+  margin-top: 1.1rem;
+  font-size: 1.05rem;
+}
+
 .section-diagram {
   display: block;
   width: 100%;

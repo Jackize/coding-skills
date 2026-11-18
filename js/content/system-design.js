@@ -1,93 +1,3 @@
-const makeBody = (language, c) => {
-  const p = language === 'en'
-    ? {
-        why: [
-          c.why,
-          `A useful design discussion about ${c.subject} connects a product promise to an engineering mechanism. Start with the visible promise in ${c.system}: what succeeds, how quickly it succeeds, and what a user sees when a dependency is slow or unavailable. Then name the mechanism that supports the promise and the cost it introduces. This chain prevents technology-first answers. It also makes disagreement concrete: one engineer may optimize ${c.metric}, while another protects ${c.invariant}. Both positions can be reasonable, but the team needs an explicit priority and an owner who accepts the product consequence.`,
-          `Mid-level engineers are expected to turn ambiguous features into designs that another team can build and operate. That means asking for evidence, recording assumptions, and identifying the first limit the system will hit. A design is not a tour of databases and cloud products. It is a set of choices tied to workload, correctness, security, and operations. For ${c.subject}, the strongest artifact is ${c.artifact}. It gives reviewers something falsifiable and gives implementers a common reference when requirements change.`,
-        ],
-        mental: [
-          c.mental,
-          `Use three lenses together. The request lens follows one unit of work through the happy path. The resource lens asks which finite resource is consumed at every step: CPU, memory, connections, bandwidth, storage, or human attention. The failure lens removes one dependency at a time and observes whether work is rejected, delayed, duplicated, served stale, or silently lost. Applying all three to ${c.system} is more reliable than memorizing a reference architecture because it exposes where the design depends on an unstated assumption.`,
-          `Keep control-plane and data-plane concerns separate. The data plane handles normal user traffic and should stay small, predictable, and measurable. The control plane changes configuration, routing, schemas, ownership, or policy. It runs less often but can affect many requests at once, so a control-plane mistake can have a larger blast radius than one data-plane failure. Write down who may change each important setting, how the change is validated, how it propagates, and how the previous state is restored.`,
-          `Treat every boundary as a contract. A caller supplies inputs, identity, and a deadline; the callee promises an outcome or a typed failure. Storage boundaries also promise durability, ordering, uniqueness, and visibility. Replace adjectives such as fast, reliable, or scalable with measurable statements. State a target for ${c.metric}, a maximum tolerated loss or stale window, and a recovery objective. Precise contracts make implementation, testing, incident response, and later evolution much easier.`,
-        ],
-        walkthrough: [
-          c.walkthrough,
-          `Begin a design walkthrough with one concrete request in ${c.example}. Give it a stable identifier, caller identity, and deadline. At every hop, write the input, output, state read or written, and possible timeout. Then repeat the walkthrough for a duplicate, a burst, a partial dependency failure, and a retry. This exercise frequently reveals duplicate writes, unbounded fan-out, hidden synchronous dependencies, unsafe trust boundaries, and missing ownership before code is written.`,
-          `Quantify the normal case and a credible peak. Estimate requests per second, bytes per request, stored bytes per day, concurrency, read-to-write ratio, and geographic skew. Rounded numbers are acceptable because the purpose is to locate orders of magnitude, not predict an exact invoice. Mark every uncertain number as an assumption and state the measurement that would replace it. If a tenfold error changes the architecture, the assumption is design-critical and deserves an early production metric, benchmark, or load test.`,
-          `Draw the smallest architecture that meets the stated requirements. Give each box one responsibility, name the source of truth, and draw arrows for data rather than vague communication. Mark synchronous arrows differently from asynchronous ones. Put a timeout and owner beside each remote call. Add the minimum operational path: deployment, health signals, rollback, data repair, and operator access. Introduce another component only when it removes a demonstrated bottleneck, isolates a meaningful failure domain, or enforces an invariant that simpler code cannot.`,
-          `Review state transitions explicitly. For every mutation, identify the idempotency boundary, uniqueness rule, transaction boundary, authorization decision, and event publication point. Ask what the caller sees if the process stops after each step. If the answer depends on luck or manual database editing, redesign the transition. In ${c.system}, the critical decision is ${c.decision}. State the invariant in one sentence, identify the component that enforces it, and name the signals that prove enforcement.`,
-          `Pressure-test the proposal. Increase traffic by ten, make one dependency five times slower, lose a zone, replay a message, deploy an incompatible client, corrupt a cache entry, and remove the operator who normally repairs data. The design need not survive every scenario without impact, but behavior must be intentional. Record the degradation mode, recovery path, affected population, and threshold at which the team must choose a more complex architecture. This gives a simple design an honest operating envelope.`,
-        ],
-        pitfalls: [
-          c.pitfalls,
-          `The most common failure is optimizing a diagram instead of an objective. Extra replicas, caches, queues, and services can improve one dimension while making correctness and operations harder. Every component creates configuration, capacity, security, deployment, on-call, and incident work. Ask which measured risk it reduces and whether a limit, index, timeout, database constraint, or background job would do the same. If the team cannot state a trigger for adding complexity, omit it and document the threshold that would reopen the decision.`,
-          `Another trap is describing only steady state. Real systems spend time during deploys, failovers, traffic shifts, schema migrations, backfills, credential rotation, and dependency incidents. These transitions often violate assumptions that look safe in a static diagram. For this topic, examine ${c.failure}. Decide whether the system fails closed, fails open, queues work, serves stale data, or rejects requests. Each answer has a product and security consequence that a named owner must accept.`,
-          `Avoid precision theater. A long capacity spreadsheet, a five-nines target, or a complicated consistency label is not useful unless it changes a choice. Prefer ranges, sensitivity analysis, and observable acceptance criteria. Write down what would prove the design wrong. Here, ${c.proof}. A design that can be disproved, repaired, and revised is stronger than one that merely sounds comprehensive.`,
-        ],
-        practice: [
-          ...c.exercises.map((x, i) => `${i + 1}. ${x}`),
-          `For each exercise, produce a one-page decision record rather than only a diagram. Include assumptions, one back-of-the-envelope calculation, the principal invariant, the worst credible failure, the source of truth, and the metric that would trigger redesign. Ask a reviewer to challenge at least one assumption and one recovery path.`,
-          `After the first pass, remove one component. Explain which requirement becomes harder, then decide whether that requirement justifies restoring it. Next, change one major assumption by ten times and trace the effect. These subtraction and sensitivity tests build judgment: the goal is not the fewest boxes at any cost, but the least operational complexity that still keeps the product promise.`,
-        ],
-      }
-    : {
-        why: [
-          c.why,
-          `Một cuộc thảo luận thiết kế hữu ích về ${c.subject} phải nối lời hứa sản phẩm với cơ chế kỹ thuật. Hãy bắt đầu từ lời hứa người dùng nhìn thấy trong ${c.system}: thao tác nào thành công, nhanh đến mức nào và user thấy gì khi một dependency chậm hoặc không sẵn sàng. Sau đó nêu cơ chế hỗ trợ lời hứa cùng chi phí nó tạo ra. Chuỗi lập luận này tránh câu trả lời bắt đầu bằng công nghệ. Nó cũng biến bất đồng thành vấn đề cụ thể: một kỹ sư tối ưu ${c.metric}, trong khi người khác bảo vệ ${c.invariant}. Cả hai có thể hợp lý, nhưng nhóm cần thứ tự ưu tiên rõ và owner chấp nhận hệ quả sản phẩm.`,
-          `Kỹ sư tầm trung được kỳ vọng biến tính năng mơ hồ thành thiết kế mà nhóm khác có thể xây dựng và vận hành. Điều đó đòi hỏi tìm evidence, ghi assumption và nhận ra giới hạn đầu tiên hệ thống sẽ chạm tới. Thiết kế không phải chuyến tham quan database và sản phẩm cloud. Nó là tập hợp lựa chọn gắn với workload, correctness, security và operations. Với ${c.subject}, artifact mạnh nhất là ${c.artifact}. Nó cho reviewer một thứ có thể kiểm chứng và cho implementer một tham chiếu chung khi yêu cầu đổi.`,
-        ],
-        mental: [
-          c.mental,
-          `Hãy dùng đồng thời ba lăng kính. Lăng kính request theo một unit of work qua happy path. Lăng kính resource hỏi tài nguyên hữu hạn nào được dùng ở mỗi bước: CPU, memory, connection, bandwidth, storage hay sự chú ý của con người. Lăng kính failure lần lượt bỏ một dependency và quan sát work bị reject, delay, duplicate, serve stale hay mất âm thầm. Áp dụng cả ba cho ${c.system} đáng tin hơn học thuộc reference architecture vì nó làm lộ giả định chưa được nói ra.`,
-          `Tách control plane khỏi data plane. Data plane xử lý traffic thường ngày nên cần nhỏ, predictable và measurable. Control plane đổi configuration, routing, schema, ownership hoặc policy. Nó chạy ít hơn nhưng có thể tác động nhiều request cùng lúc, nên một lỗi control plane có blast radius lớn hơn một data-plane failure. Hãy ghi ai được đổi từng setting quan trọng, thay đổi được validate và propagate thế nào, và trạng thái trước được restore ra sao.`,
-          `Xem mỗi boundary là một contract. Caller cung cấp input, identity và deadline; callee hứa outcome hoặc typed failure. Storage boundary cũng hứa durability, ordering, uniqueness và visibility. Thay các tính từ nhanh, tin cậy hay scalable bằng phát biểu đo được. Nêu target cho ${c.metric}, cửa sổ mất hoặc stale tối đa và recovery objective. Contract chính xác giúp implementation, testing, incident response và evolution về sau dễ hơn.`,
-        ],
-        walkthrough: [
-          c.walkthrough,
-          `Bắt đầu walkthrough bằng một request cụ thể trong ${c.example}. Gắn stable identifier, caller identity và deadline. Ở mỗi hop, ghi input, output, state được read hoặc write và timeout có thể xảy ra. Sau đó lặp lại với duplicate, burst, partial dependency failure và retry. Bài tập này thường phát hiện duplicate write, unbounded fan-out, synchronous dependency bị giấu, trust boundary không an toàn và ownership còn thiếu trước khi code được viết.`,
-          `Định lượng normal case và một peak đáng tin. Ước lượng request mỗi giây, byte mỗi request, byte lưu mỗi ngày, concurrency, read-to-write ratio và geographic skew. Số làm tròn là đủ vì mục tiêu là tìm bậc độ lớn, không phải dự đoán chính xác hóa đơn. Đánh dấu mọi số chưa chắc là assumption và nêu measurement sẽ thay thế nó. Nếu sai số mười lần làm đổi architecture thì assumption đó là design-critical và cần production metric, benchmark hoặc load test sớm.`,
-          `Vẽ architecture nhỏ nhất đáp ứng yêu cầu. Mỗi box có một responsibility, nêu source of truth và vẽ arrow cho data thay vì communication mơ hồ. Phân biệt synchronous arrow và asynchronous arrow. Ghi timeout và owner cạnh mỗi remote call. Thêm operational path tối thiểu: deployment, health signal, rollback, data repair và operator access. Chỉ thêm component khi nó loại demonstrated bottleneck, cô lập failure domain có ý nghĩa hoặc enforce invariant mà code đơn giản hơn không làm được.`,
-          `Review rõ state transition. Với mỗi mutation, xác định idempotency boundary, uniqueness rule, transaction boundary, authorization decision và event publication point. Hỏi caller thấy gì nếu process dừng sau từng bước. Nếu câu trả lời phụ thuộc may mắn hoặc sửa database thủ công, hãy redesign transition. Trong ${c.system}, critical decision là ${c.decision}. Viết invariant trong một câu, xác định component enforce nó và nêu signal chứng minh enforcement.`,
-          `Tạo áp lực cho proposal. Tăng traffic mười lần, làm một dependency chậm gấp năm, mất một zone, replay message, deploy client không tương thích, làm hỏng cache entry và loại operator thường repair data. Design không cần vượt mọi scenario mà không impact, nhưng behavior phải có chủ đích. Ghi degradation mode, recovery path, affected population và threshold buộc team chọn architecture phức tạp hơn. Nhờ vậy một design đơn giản có operating envelope trung thực.`,
-        ],
-        pitfalls: [
-          c.pitfalls,
-          `Failure phổ biến nhất là tối ưu diagram thay vì objective. Thêm replica, cache, queue và service có thể cải thiện một chiều nhưng làm correctness và operations khó hơn. Mỗi component tạo việc configuration, capacity, security, deployment, on-call và incident. Hỏi nó giảm measured risk nào và liệu limit, index, timeout, database constraint hoặc background job có đủ không. Nếu team không nêu được trigger để thêm complexity, hãy bỏ nó và ghi threshold sẽ mở lại decision.`,
-          `Bẫy khác là chỉ mô tả steady state. System thật trải qua deploy, failover, traffic shift, schema migration, backfill, credential rotation và dependency incident. Những transition này thường phá assumption nhìn có vẻ an toàn trên diagram tĩnh. Với chủ đề này, hãy xét ${c.failure}. Quyết định system fail closed, fail open, queue work, serve stale data hay reject request. Mỗi câu trả lời có hệ quả product và security mà một owner được nêu tên phải chấp nhận.`,
-          `Tránh precision theater. Capacity spreadsheet dài, target năm số chín hoặc consistency label phức tạp không hữu ích nếu nó không đổi lựa chọn. Ưu tiên range, sensitivity analysis và observable acceptance criterion. Viết điều gì chứng minh design sai. Ở đây, ${c.proof}. Một design có thể bị bác bỏ, repair và revise mạnh hơn design chỉ nghe có vẻ toàn diện.`,
-        ],
-        practice: [
-          ...c.exercises.map((x, i) => `${i + 1}. ${x}`),
-          `Với mỗi bài, tạo decision record một trang thay vì chỉ có diagram. Bao gồm assumption, một phép tính gần đúng, principal invariant, worst credible failure, source of truth và metric kích hoạt redesign. Nhờ reviewer chất vấn ít nhất một assumption và một recovery path.`,
-          `Sau bản đầu, bỏ một component. Giải thích requirement nào khó hơn rồi quyết định requirement đó có đáng để khôi phục component không. Tiếp theo, thay một major assumption gấp mười và trace effect. Phép thử subtraction và sensitivity này xây judgment: mục tiêu không phải ít box nhất bằng mọi giá mà là operational complexity thấp nhất vẫn giữ lời hứa product.`,
-        ],
-      };
-
-  return [
-    '## Why this matters',
-    ...p.why,
-    '## Mental model',
-    ...p.mental,
-    '## Walkthrough',
-    ...p.walkthrough,
-    '## Pitfalls & trade-offs',
-    ...p.pitfalls,
-    '## Practice / exercises',
-    ...p.practice,
-  ].join('\n\n');
-};
-
-const section = (s) => ({
-  id: s.id,
-  title: s.title,
-  baseline: s.baseline,
-  skills: s.skills,
-  diagram: s.id,
-  body: { en: makeBody('en', s.en), vn: makeBody('vn', s.vn) },
-});
-
 /** @type {import('../catalog.js').Course} */
 export const systemDesign = {
   id: 'system-design',
@@ -97,7 +7,7 @@ export const systemDesign = {
     vn: 'Thiết kế service thực tế bằng cách nối yêu cầu, quy mô, dữ liệu, interface, failure và operations với lời hứa sản phẩm rõ ràng.',
   },
   sections: [
-    section({
+    {
       id: 'clarifying-requirements',
       title: { en: 'Clarifying requirements & constraints', vn: 'Làm rõ yêu cầu và ràng buộc' },
       baseline: {
@@ -108,40 +18,231 @@ export const systemDesign = {
         en: ['Define measurable scope, SLOs, and non-goals', 'Surface product, legal, security, and operational constraints', 'Rank assumptions by architectural impact'],
         vn: ['Định nghĩa scope, SLO đo được và non-goal', 'Làm lộ constraint sản phẩm, pháp lý, security và operations', 'Xếp hạng assumption theo tác động architecture'],
       },
-      en: {
-        subject: 'requirements and constraints',
-        system: 'a URL-shortening service',
-        metric: 'successful redirect latency at the 99th percentile',
-        invariant: 'the rule that one active short code resolves to exactly one destination',
-        artifact: 'a requirement table with acceptance criteria and named owners',
-        example: 'creating and resolving a short URL',
-        decision: 'whether redirect availability or immediately visible edits take priority during a partition',
-        failure: 'the product owner changing retention or custom-alias rules after storage has been selected',
-        proof: 'a review should map every major component to one approved requirement and every requirement to an observable test',
-        why: 'Weak designs often fail before the first box is drawn because the team solves a different problem from the one users, compliance reviewers, or operators actually have. A URL shortener sounds like two endpoints, yet custom aliases, expiration, abuse prevention, analytics, regional latency, and deletion obligations lead to very different systems. Clarification protects scope, prevents accidental promises, and gives the team permission to postpone features that do not belong in the first release.',
-        mental: 'Treat discovery as a funnel. Begin with actors and journeys, narrow to functional operations, then add quality attributes, constraints, and non-goals. For every statement, ask whether it describes behavior, scale, correctness, policy, or implementation. Keep facts separate from estimates and estimates separate from choices. Data residency, an existing identity provider, a fixed runtime, or a contractual recovery target may be real constraints; a familiar database is usually only a preference.',
-        walkthrough: 'For a global URL shortener, define anonymous redirect readers, authenticated creators, support staff, and abuse investigators. Define create, resolve, disable, and inspect-click journeys. Ask whether aliases are editable, reusable, case-sensitive, or guessable; what an expired link returns; and how fast a malicious link must stop. Request daily creations, peak redirects, geographic distribution, destination size, and retention. Set redirect availability and latency separately from the management API. Permit analytics to lag if approved. Record abuse and billing as explicit dependencies. List non-goals such as per-click billing, real-time dashboards, and arbitrary rewrites for version one.',
-        pitfalls: 'Do not accept a percentage without population and window. Monthly availability differs from per-region availability, and average latency hides the slow users who drive support cases. Do not let a current implementation become a permanent product constraint. Ask who may perform each action, what may be stale, what must be deleted, how revocation propagates, and which failures are visible. A requirement without an owner or acceptance test is still an assumption.',
-        exercises: ['Write a URL-shortener brief with four functional requirements, four measurable quality attributes, three constraints, and three non-goals.', 'Create ten architecture-changing questions for a home-feed product owner and state a default for each unanswered question.', 'Replace highly available checkout with separate targets for browsing, order submission, payment confirmation, and operator recovery.'],
+      diagram: 'clarifying-requirements',
+      body: {
+        en: `## Analysis
+
+Start with the **product promise**, not a database or cloud diagram. Identify the actors, their main journeys, and the outcome each actor considers successful. A URL shortener, for example, serves link creators, redirect visitors, support staff, and abuse reviewers; each has different permissions and latency needs.
+
+Separate statements into:
+
+- **Facts**: legal residency, an existing identity provider, or a contractual recovery target.
+- **Assumptions**: expected traffic, retention, or geographic distribution that still needs evidence.
+- **Decisions**: a chosen availability target, storage model, or consistency rule.
+- **Preferences**: familiar tools that may be changed without violating the product.
+
+Rank uncertainty by architectural impact. If changing an estimate by ten times changes the design, validate it early.
+
+## Requirements
+
+Write functional requirements as observable behavior:
+
+- Create, resolve, disable, expire, and inspect a short link.
+- Define who may perform each action and whether anonymous access is allowed.
+- State what an unknown, expired, disabled, or malicious link returns.
+- Define whether destinations and custom aliases are mutable or reusable.
+
+Then add measurable quality requirements. Replace “fast” with **p99 redirect latency under a named load**, and replace “reliable” with an availability percentage, population, and measurement window. State recovery objectives, retention, deletion deadlines, audit needs, privacy rules, and acceptable analytics delay.
+
+Record non-goals explicitly. *Real-time analytics, arbitrary destination edits, per-click billing, and active-active writes* might be deferred from version one.
+
+## Features
+
+Prioritize features by journey and risk:
+
+1. **Core**: create a generated link and redirect it.
+2. **Safety**: disable abuse, validate destinations, and rate-limit creation.
+3. **Management**: list, expire, or delete owned links.
+4. **Optional**: custom aliases, campaign analytics, previews, and regional writes.
+
+For each feature, name acceptance criteria and an owner. “Analytics” is incomplete; “campaign owners see hourly counts within 15 minutes, excluding known bots” is testable. Clarify whether counts are billing-grade or approximate because that choice changes event durability and reconciliation.
+
+## Tech choices
+
+Technology follows constraints. A relational database is a reasonable initial source of truth when uniqueness and management queries matter. A key-value store may fit a very large, simple redirect workload, but secondary queries and uniqueness workflows still need design. A cache is justified by read reuse and latency targets, not by fashion.
+
+Create a short decision table:
+
+| Decision | Requirement | Evidence needed |
+|---|---|---|
+| Single write region | Strong alias uniqueness | Regional latency estimate |
+| Cache redirects | p99 under 50 ms | Hit-rate and origin benchmark |
+| Async analytics | Redirect isolation | Approved freshness window |
+
+## Design
+
+Draw the smallest system that meets approved requirements:
+
+- **Create API** validates identity, policy, URL, and alias.
+- **Mapping store** owns the code-to-destination invariant.
+- **Redirect service** performs a narrow lookup and returns HTTP redirect.
+- **Cache** accelerates proven repeated reads.
+- **Event pipeline** processes analytics away from the redirect path.
+
+Label each synchronous arrow with a deadline and each asynchronous arrow with delivery semantics. Mark the source of truth, trust boundaries, and operator actions. Walk a normal request, duplicate create, cache miss, abuse revocation, and dependency timeout.
+
+## Code
+
+Capture requirements as data so reviewers can challenge them:
+
+~~~json
+{
+  "journey": "redirect",
+  "sli": "successful responses / valid requests",
+  "target": "99.95% per rolling 30 days",
+  "latency": "p99 < 50 ms at 12000 rps",
+  "revocation": "disabled links stop within 10 seconds"
+}
+~~~
+
+Keep unresolved values marked as assumptions with an owner and validation date. Do not silently turn a placeholder into a guarantee.
+
+## Deploy
+
+Treat rollout constraints as requirements. Define backward-compatible schema changes, canary population, rollback behavior, feature flags, and data repair. Ask whether old mobile or partner clients remain active during a release. Define who can change routing, retention, or abuse policy and how those control-plane changes are audited and reverted.
+
+Before launch, verify the SLO with representative load, test a cache loss, and exercise link revocation. Launch limits should name traffic, tenant, or region boundaries rather than saying “gradual.”
+
+## Trade-offs
+
+Requirements compete:
+
+- Lower redirect latency may require caching and therefore controlled staleness.
+- Immediate global edits require coordination that can reduce availability.
+- Strong analytics durability adds cost and coupling.
+- Custom aliases improve usability but create contention, moderation, and namespace policy.
+
+Document which product outcome wins during conflict. *“Prefer redirect availability over immediate analytics”* is useful; *“use eventual consistency”* alone is not.
+
+## Failure modes
+
+Common requirement failures include:
+
+- A percentage without a population or time window.
+- An average latency target that hides tail behavior.
+- A feature without authorization, retention, or deletion semantics.
+- A hidden dependency such as billing or abuse review.
+- A current implementation mistaken for a permanent constraint.
+- A non-goal that quietly returns during delivery.
+
+For every major requirement, ask what the user sees when one dependency is slow, unavailable, stale, or duplicated. If the answer has product or security impact, a named owner must accept it.
+
+## Practice
+
+1. Write a URL-shortener brief with four functional requirements, four quality targets, three constraints, and three non-goals.
+2. Create ten architecture-changing questions for a home-feed product owner. Provide a safe default for every unanswered question.
+3. Replace “highly available checkout” with separate targets for browsing, order submission, payment confirmation, and operator recovery.
+4. Map every proposed component to one approved requirement. Remove any component that has no requirement or demonstrated risk.`,
+        vn: `## Phân tích
+
+Bắt đầu bằng **lời hứa sản phẩm**, không bắt đầu bằng database hay cloud diagram. Xác định actor, journey chính và outcome mà từng actor xem là thành công. URL shortener phục vụ creator, visitor, support và abuse reviewer; mỗi nhóm có permission cùng latency khác nhau.
+
+Tách thông tin thành:
+
+- **Fact**: data residency, identity provider hiện có, recovery target theo hợp đồng.
+- **Assumption**: traffic, retention, geographic distribution chưa được đo.
+- **Decision**: availability target, storage model, consistency rule đã chọn.
+- **Preference**: công cụ quen thuộc nhưng có thể thay.
+
+Assumption nào thay đổi mười lần sẽ đổi architecture thì phải validate sớm.
+
+## Yêu cầu
+
+Viết functional requirement dưới dạng behavior quan sát được:
+
+- Create, resolve, disable, expire và inspect short link.
+- Nêu ai được thực hiện từng action.
+- Định nghĩa response cho code missing, expired, disabled hoặc malicious.
+- Chốt destination và custom alias có mutable hoặc reusable không.
+
+Thay “nhanh” bằng **p99 latency dưới named load**; thay “ổn định” bằng availability có population và window. Ghi rõ RPO, RTO, retention, deletion deadline, privacy, audit và analytics delay. Liệt kê non-goal như real-time dashboard, arbitrary edit hoặc active-active write.
+
+## Tính năng
+
+Ưu tiên theo journey và risk:
+
+1. **Core**: tạo generated link và redirect.
+2. **Safety**: disable abuse, validate URL, rate-limit creation.
+3. **Management**: list, expire, delete link của owner.
+4. **Optional**: custom alias, campaign analytics, preview, regional write.
+
+Mỗi feature cần acceptance criterion và owner. “Có analytics” chưa đủ; “hourly count xuất hiện trong 15 phút và loại known bot” mới test được.
+
+## Công nghệ
+
+Chọn technology sau constraint. Relational database là default hợp lý khi cần uniqueness và management query. Key-value store phù hợp workload lookup rất lớn nhưng secondary query và uniqueness vẫn phải được thiết kế. Cache chỉ hợp lý khi có read reuse và latency target.
+
+| Decision | Requirement | Evidence |
+|---|---|---|
+| Single write region | Alias unique | Regional latency |
+| Redirect cache | p99 dưới 50 ms | Hit-rate benchmark |
+| Async analytics | Redirect độc lập | Freshness window |
+
+## Thiết kế
+
+Vẽ system nhỏ nhất:
+
+- **Create API** validate identity, policy, URL và alias.
+- **Mapping store** giữ invariant code-to-destination.
+- **Redirect service** lookup rồi trả redirect.
+- **Cache** giảm repeated read.
+- **Event pipeline** xử lý analytics ngoài critical path.
+
+Ghi deadline trên synchronous arrow, delivery semantic trên asynchronous arrow, source of truth và trust boundary. Walk happy path, duplicate create, cache miss, abuse revocation và timeout.
+
+## Code
+
+Biểu diễn requirement thành artifact review được:
+
+~~~json
+{
+  "journey": "redirect",
+  "sli": "successful responses / valid requests",
+  "target": "99.95% trong 30 ngày",
+  "latency": "p99 < 50 ms tại 12000 rps",
+  "revocation": "disable có hiệu lực trong 10 giây"
+}
+~~~
+
+Assumption chưa xác nhận phải có owner và ngày validate; không biến placeholder thành guarantee một cách âm thầm.
+
+## Deploy
+
+Định nghĩa compatible migration, canary population, rollback, feature flag và data repair. Hỏi old client nào còn hoạt động. Chốt ai được đổi routing, retention, abuse policy và cách audit hoặc revert control-plane change.
+
+Trước launch, load test SLO, thử cache loss và diễn tập revocation. “Rollout dần” phải được thay bằng traffic, tenant hoặc region cụ thể.
+
+## Trade-offs
+
+- Latency thấp cần cache và chấp nhận staleness có giới hạn.
+- Edit global tức thì cần coordination, có thể giảm availability.
+- Durable analytics tăng cost và coupling.
+- Custom alias tăng usability nhưng tạo contention và moderation.
+
+Ghi product outcome nào thắng khi conflict. *Ưu tiên redirect availability hơn analytics tức thì* là decision rõ.
+
+## Phân tích lỗi
+
+Các lỗi phổ biến:
+
+- Percentage thiếu population hoặc window.
+- Average latency che tail.
+- Feature thiếu authorization, retention hoặc deletion semantic.
+- Hidden dependency như billing hay abuse review.
+- Current implementation bị xem là permanent constraint.
+- Non-goal quay lại mà không được review.
+
+Với mỗi requirement, hỏi user thấy gì khi dependency slow, unavailable, stale hoặc duplicate.
+
+## Practice
+
+1. Viết brief URL shortener gồm bốn functional requirement, bốn quality target, ba constraint và ba non-goal.
+2. Tạo mười câu hỏi làm đổi architecture cho home feed và default an toàn cho câu chưa trả lời.
+3. Tách “checkout availability cao” thành target cho browse, submit, payment confirmation và recovery.
+4. Map mỗi component tới requirement; bỏ component không có căn cứ.`,
       },
-      vn: {
-        subject: 'yêu cầu và constraint',
-        system: 'dịch vụ rút gọn URL',
-        metric: 'latency redirect thành công ở percentile 99',
-        invariant: 'quy tắc một short code active chỉ resolve tới đúng một destination',
-        artifact: 'bảng requirement có acceptance criterion và owner được nêu tên',
-        example: 'tạo và resolve một URL ngắn',
-        decision: 'ưu tiên redirect availability hay edit visible ngay khi có partition',
-        failure: 'product owner đổi retention hoặc custom-alias rule sau khi đã chọn storage',
-        proof: 'review phải map mọi major component tới approved requirement và mọi requirement tới observable test',
-        why: 'Design yếu thường thất bại trước khi box đầu tiên được vẽ vì team giải bài toán khác với nhu cầu thật của user, compliance reviewer hoặc operator. URL shortener nghe như hai endpoint, nhưng custom alias, expiration, chống abuse, analytics, regional latency và nghĩa vụ xóa dẫn tới các system rất khác nhau. Clarification bảo vệ scope, ngăn accidental promise và cho phép hoãn feature không thuộc first release.',
-        mental: 'Xem discovery như một cái phễu. Bắt đầu bằng actor và journey, thu hẹp thành functional operation, rồi thêm quality attribute, constraint và non-goal. Với mỗi phát biểu, hỏi nó mô tả behavior, scale, correctness, policy hay implementation. Tách fact khỏi estimate và estimate khỏi choice. Data residency, identity provider sẵn có, runtime cố định hoặc recovery target theo contract có thể là constraint thật; database quen thuộc thường chỉ là preference.',
-        walkthrough: 'Với URL shortener toàn cầu, định nghĩa anonymous redirect reader, authenticated creator, support staff và abuse investigator. Định nghĩa journey create, resolve, disable và inspect click. Hỏi alias có editable, reusable, case-sensitive hay guessable; link expired trả gì; malicious link phải dừng nhanh đến đâu. Lấy số creation mỗi ngày, peak redirect, geographic distribution, destination size và retention. Đặt availability và latency của redirect tách khỏi management API. Cho analytics lag nếu được duyệt. Ghi abuse và billing thành explicit dependency. Liệt kê non-goal như per-click billing, real-time dashboard và arbitrary rewrite ở version một.',
-        pitfalls: 'Không chấp nhận percentage nếu thiếu population và window. Monthly availability khác per-region availability, còn average latency che slow user tạo support case. Đừng để current implementation biến thành permanent product constraint. Hỏi ai được làm từng action, gì được stale, gì phải delete, revocation propagate ra sao và failure nào user thấy. Requirement thiếu owner hoặc acceptance test vẫn chỉ là assumption.',
-        exercises: ['Viết brief URL shortener với bốn functional requirement, bốn quality attribute đo được, ba constraint và ba non-goal.', 'Tạo mười câu hỏi làm đổi architecture cho product owner của home feed và nêu default cho từng câu chưa trả lời.', 'Thay cụm checkout availability cao bằng target riêng cho browsing, order submission, payment confirmation và operator recovery.'],
-      },
-    }),
-    section({
+    },
+    {
       id: 'capacity-latency-consistency',
       title: { en: 'Capacity, latency, consistency', vn: 'Capacity, latency và consistency' },
       baseline: {
@@ -152,40 +253,218 @@ export const systemDesign = {
         en: ['Build capacity estimates with sensitivity ranges', 'Allocate latency budgets across dependencies', 'Choose consistency per operation and invariant'],
         vn: ['Lập capacity estimate với sensitivity range', 'Phân bổ latency budget qua dependency', 'Chọn consistency theo operation và invariant'],
       },
-      en: {
-        subject: 'capacity, latency, and consistency',
-        system: 'a personalized home feed',
-        metric: 'feed render latency and freshness at the 95th and 99th percentiles',
-        invariant: 'the requirement that users never see content they are forbidden to access',
-        artifact: 'an assumptions sheet linked to a latency budget and an operation-level consistency table',
-        example: 'opening a feed after following a new account',
-        decision: 'which updates must be immediately visible and which may converge asynchronously',
-        failure: 'a celebrity post creating write fan-out several orders above the median',
-        proof: 'load tests and production histograms should show where saturation begins and whether staleness stays inside the approved window',
-        why: 'Capacity says whether a design fits the workload; latency says whether it fits the experience; consistency says whether users can trust the result. The dimensions interact. Precomputing feeds spends storage and writes to reduce read latency. Replicas improve geographic latency but may expose stale follows. Strong coordination protects narrow invariants but can reduce availability during partitions. The goal is not to maximize every dimension; it is to spend budget where the product receives value.',
-        mental: 'Use dimensional analysis and operation-specific guarantees. Convert daily volume to average rate, multiply by a credible peak factor, and derive concurrency from rate times service time. Derive retained storage from bytes per item, items per period, replication, indexes, and retention. Start latency with the client target and subtract network, queueing, compute, storage, and margin. Name read-after-write, monotonic-read, uniqueness, ordering, or atomicity needs per operation instead of labeling the whole system.',
-        walkthrough: 'For ten million daily active users opening a feed twenty times, expect two hundred million reads daily: about 2,300 per second average and perhaps 12,000 peak. Twenty items at two kilobytes produce roughly 480 megabytes per second raw at peak before compression. Allocate a 300-millisecond server budget across routing, feed lookup, hydration, policy, serialization, and margin. A post may appear within seconds, but a block or privacy change must prevent unauthorized reads immediately. A user should see their own follow quickly while ranking may converge. These distinctions suggest hybrid fan-out plus a synchronous authorization check independent of feed freshness.',
-        pitfalls: 'Averages conceal peaks and queueing collapse. Keep low, expected, and high cases rather than multiplying rounded values into false precision. Replication and indexes consume storage. Compression changes network bytes but not necessarily memory. Consistency is not a database-wide switch: stale ranking may be acceptable while stale access control is not. Distinguish durability from visibility; a durable event may not yet appear in a materialized view.',
-        exercises: ['Estimate QPS, egress, and one-year storage for a feed using low, expected, and high assumptions.', 'Create a 250-millisecond budget for a request with four remote dependencies and model one dependency taking twice its allocation.', 'Classify publish, follow, block, like count, ranking, and delete by required consistency and defend each choice.'],
+      diagram: 'capacity-latency-consistency',
+      body: {
+        en: `## Analysis
+
+Capacity, latency, and consistency answer three different questions: **Can the system carry the workload? Can it respond within the experience budget? Can users trust what they see?** They interact, so optimize them per journey rather than applying one label to the whole system.
+
+Use ranges instead of false precision. Record low, expected, and high values for daily users, actions per user, bytes per item, peak factor, retention, and replication. Mark the assumptions that would change the architecture if wrong by ten times.
+
+## Requirements
+
+Define the workload per operation:
+
+- Average and peak reads and writes per second.
+- Read/write ratio, item size, response size, and retention.
+- Geographic and tenant skew.
+- Burst duration and peak-to-average factor.
+- Required p50, p95, and p99 latency.
+- Freshness, ordering, uniqueness, and read-after-write expectations.
+
+Consistency must protect specific invariants. A feed rank may be stale for seconds, while a block or privacy change must prevent unauthorized access immediately. Distinguish **durability** from **visibility**: a committed event can be durable before a materialized view displays it.
+
+## Features
+
+For a personalized feed, analyze publish, fan-out, read, follow, block, delete, and ranking separately. Each operation has a different load shape and correctness requirement.
+
+- Publishing may create large write fan-out.
+- Reading is frequent and latency-sensitive.
+- Following benefits from read-your-writes.
+- Blocking is authorization-sensitive.
+- Like counts may converge asynchronously.
+- Deletion needs a bounded propagation and repair path.
+
+A celebrity account is not an average account. Model high-fan-out users and viral items explicitly.
+
+## Tech choices
+
+Choose mechanisms from the workload:
+
+- **Precomputed feeds** spend writes and storage to make reads cheap.
+- **Read-time assembly** saves fan-out writes but increases read latency.
+- **Hybrid fan-out** precomputes ordinary authors and assembles celebrity posts at read time.
+- **Replicas** reduce read latency but may return stale state.
+- **Coordination** protects narrow invariants but can reduce availability during partitions.
+
+Do not call an entire database “strongly consistent” or “eventually consistent.” State the guarantee for each operation and the source that enforces it.
+
+## Design
+
+Start with dimensional analysis:
+
+~~~text
+average QPS = daily operations / 86,400
+peak QPS = average QPS × credible peak factor
+concurrency ≈ QPS × service time in seconds
+storage = items × bytes × retention × replication/index factor
+~~~
+
+For 10 million daily users opening a feed 20 times, there are 200 million reads per day: about 2,315 average QPS. With a 5× peak, plan around 11,600 QPS before safety margin. Twenty 2 KB items at 12,000 QPS produce about 480 MB/s of raw response data before protocol overhead and compression.
+
+Build a latency budget from the outside in. A 400 ms client target might allocate 80 ms network, 30 ms gateway, 120 ms feed lookup, 80 ms hydration and policy, 30 ms serialization, and 60 ms margin. Parallel calls consume the maximum branch time; sequential calls add.
+
+## Code
+
+Keep calculations reproducible:
+
+~~~js
+const dailyReads = 10_000_000 * 20;
+const averageQps = dailyReads / 86_400;
+const peakQps = averageQps * 5;
+const rawBytesPerSecond = peakQps * 20 * 2_000;
+~~~
+
+Add units to every variable and table. Run sensitivity checks at 0.1×, 1×, and 10×. A spreadsheet is useful only when a changed number changes a decision.
+
+## Deploy
+
+Validate estimates with representative traffic, including realistic key skew and payload size. Ramp load until saturation, then record where queueing causes p99 latency to rise sharply. Test one-zone loss and a lagging replica.
+
+Deploy consistency changes carefully. A new asynchronous projection may coexist with the old read path until counts, freshness, and authorization results match. Monitor lag in time and items, not only consumer throughput. Keep rollback compatible with both old and new data.
+
+## Trade-offs
+
+- More replication improves read capacity and resilience but increases cost and stale-read risk.
+- Larger batches improve throughput but add waiting latency.
+- More fan-out improves feed reads but amplifies celebrity writes.
+- Stronger coordination protects correctness but costs latency and partition availability.
+- Compression lowers bandwidth but consumes CPU and may not reduce in-memory size.
+
+Spend complexity only where a measurable product target needs it.
+
+## Failure modes
+
+Watch for:
+
+- Averages hiding bursts, skew, or queueing collapse.
+- Missing replication, indexes, metadata, or backups in storage estimates.
+- Unlimited concurrency exhausting connections before CPU.
+- One hot partition while fleet-wide utilization appears low.
+- Stale access-control data treated like stale ranking.
+- Durable events mistaken for immediately visible state.
+- Percentiles aggregated incorrectly across regions or time windows.
+
+Define overload behavior: reject, shed optional work, serve stale data, reduce page size, or queue bounded work. Silent latency growth is not a strategy.
+
+## Practice
+
+1. Estimate QPS, egress, and one-year storage for a feed using low, expected, and high assumptions.
+2. Create a 250 ms server budget for a request with four dependencies. Model one dependency taking twice its allocation.
+3. Classify publish, follow, block, like count, ranking, and delete by required consistency.
+4. Recalculate the design for a celebrity with 100 million followers and identify the first bottleneck.`,
+        vn: `## Phân tích
+
+Capacity, latency và consistency trả lời ba câu hỏi: **system có chịu được workload, có đáp ứng experience budget, và user có tin state nhìn thấy không?** Ba chiều tương tác nên phải phân tích theo journey, không gắn một label cho toàn hệ thống.
+
+Dùng range thấp, expected và cao. Ghi daily users, action mỗi user, byte mỗi item, peak factor, retention và replication. Assumption sai mười lần làm đổi design cần được validate trước.
+
+## Yêu cầu
+
+Định nghĩa theo operation:
+
+- Average và peak read/write mỗi giây.
+- Read/write ratio, item size, response size, retention.
+- Geographic, tenant và key skew.
+- Burst duration, p50, p95, p99 latency.
+- Freshness, ordering, uniqueness, read-after-write.
+
+Consistency phải bảo vệ invariant cụ thể. Feed ranking có thể stale vài giây, nhưng block hay privacy change phải ngăn unauthorized read ngay. Tách **durability** khỏi **visibility**.
+
+## Tính năng
+
+Với personalized feed, phân tích publish, fan-out, read, follow, block, delete và ranking riêng:
+
+- Publish tạo write fan-out.
+- Read thường xuyên và latency-sensitive.
+- Follow cần read-your-writes.
+- Block liên quan authorization.
+- Like count có thể converge.
+- Delete cần propagation deadline và repair.
+
+Celebrity account không phải average account; model hot author và viral item rõ ràng.
+
+## Công nghệ
+
+- **Precompute feed** đổi write và storage lấy cheap read.
+- **Read-time assembly** giảm fan-out nhưng tăng read latency.
+- **Hybrid** precompute author thường, merge celebrity khi read.
+- **Replica** giảm latency nhưng có stale state.
+- **Coordination** bảo vệ invariant nhưng giảm availability khi partition.
+
+Nêu guarantee theo operation và source enforce nó; không gắn nhãn consistency chung chung cho database.
+
+## Thiết kế
+
+~~~text
+average QPS = daily operations / 86.400
+peak QPS = average QPS × peak factor
+concurrency ≈ QPS × service time
+storage = items × bytes × retention × replication/index
+~~~
+
+10 triệu daily user mở feed 20 lần tạo 200 triệu read/ngày, khoảng 2.315 average QPS. Peak 5× là gần 11.600 QPS. Hai mươi item 2 KB tại 12.000 QPS tạo khoảng 480 MB/s raw.
+
+Lập latency budget từ client vào trong. Ví dụ target 400 ms gồm network, gateway, feed lookup, hydration, policy, serialization và margin. Sequential call cộng thời gian; parallel branch chịu branch chậm nhất.
+
+## Code
+
+~~~js
+const dailyReads = 10_000_000 * 20;
+const averageQps = dailyReads / 86_400;
+const peakQps = averageQps * 5;
+const rawBytesPerSecond = peakQps * 20 * 2_000;
+~~~
+
+Gắn unit vào mọi số và chạy sensitivity ở 0,1×, 1×, 10×. Calculation chỉ có giá trị nếu nó thay đổi decision.
+
+## Deploy
+
+Load test bằng payload và key skew thực. Tăng traffic tới saturation rồi ghi điểm queueing làm p99 tăng mạnh. Test zone loss và lagging replica.
+
+Khi chuyển read path sang projection async, chạy song song old/new và so count, freshness, authorization. Monitor lag theo time lẫn item. Rollback phải đọc được data của cả version cũ và mới.
+
+## Trade-offs
+
+- Replication tăng capacity nhưng tốn cost và tạo stale-read risk.
+- Batch lớn tăng throughput nhưng thêm waiting latency.
+- Fan-out tăng read speed nhưng amplify celebrity write.
+- Coordination tăng correctness nhưng tốn latency.
+- Compression giảm bandwidth nhưng dùng CPU.
+
+Chỉ mua complexity cho target sản phẩm đo được.
+
+## Phân tích lỗi
+
+- Average che burst, skew và queue collapse.
+- Storage estimate quên replica, index, metadata, backup.
+- Unlimited concurrency cạn connection trước CPU.
+- Hot partition bị che bởi fleet average.
+- Stale authorization bị xem như stale ranking.
+- Durable event bị hiểu nhầm là visible ngay.
+- Percentile bị aggregate sai giữa region hoặc window.
+
+Định nghĩa overload behavior: reject, shed optional work, serve stale, giảm page size hoặc queue có bound.
+
+## Practice
+
+1. Ước lượng QPS, egress và storage một năm cho feed ở ba scenario.
+2. Tạo latency budget 250 ms cho request có bốn dependency.
+3. Phân loại consistency cho publish, follow, block, like, ranking, delete.
+4. Tính lại khi celebrity có 100 triệu follower và tìm bottleneck đầu tiên.`,
       },
-      vn: {
-        subject: 'capacity, latency và consistency',
-        system: 'home feed được cá nhân hóa',
-        metric: 'feed render latency và freshness ở percentile 95 và 99',
-        invariant: 'yêu cầu user không thấy content họ không có quyền truy cập',
-        artifact: 'assumption sheet nối với latency budget và bảng consistency theo operation',
-        example: 'mở feed sau khi follow một account mới',
-        decision: 'update nào phải visible ngay và update nào có thể converge async',
-        failure: 'một celebrity post tạo write fan-out lớn hơn median nhiều bậc',
-        proof: 'load test và production histogram phải cho thấy saturation bắt đầu ở đâu và staleness có nằm trong approved window không',
-        why: 'Capacity cho biết design có vừa workload; latency cho biết nó có vừa experience; consistency cho biết user có thể tin result không. Các chiều tương tác. Precompute feed tiêu storage và write để giảm read latency. Replica cải thiện geographic latency nhưng có thể lộ follow cũ. Strong coordination bảo vệ invariant hẹp nhưng giảm availability khi partition. Mục tiêu không phải tối đa mọi chiều mà là dùng budget nơi product nhận value.',
-        mental: 'Dùng dimensional analysis và guarantee theo operation. Đổi daily volume thành average rate, nhân credible peak factor và tính concurrency bằng rate nhân service time. Tính retained storage từ byte mỗi item, item mỗi period, replication, index và retention. Bắt đầu latency từ client target rồi trừ network, queueing, compute, storage và margin. Nêu read-after-write, monotonic-read, uniqueness, ordering hoặc atomicity cho từng operation thay vì gắn nhãn toàn system.',
-        walkthrough: 'Với mười triệu daily active user mở feed hai mươi lần, có hai trăm triệu read mỗi ngày: trung bình khoảng 2.300 mỗi giây và có thể 12.000 ở peak. Hai mươi item, mỗi item hai kilobyte tạo khoảng 480 megabyte mỗi giây raw ở peak trước compression. Phân bổ server budget 300 millisecond cho routing, feed lookup, hydration, policy, serialization và margin. Post có thể xuất hiện sau vài giây, nhưng block hoặc privacy change phải ngăn unauthorized read ngay. User nên thấy follow của mình sớm còn ranking có thể converge. Các khác biệt này gợi ý hybrid fan-out cộng synchronous authorization check độc lập với feed freshness.',
-        pitfalls: 'Average che peak và queueing collapse. Giữ case thấp, expected và cao thay vì nhân rounded value thành false precision. Replication và index tốn storage. Compression đổi network byte nhưng không nhất thiết đổi memory. Consistency không phải database-wide switch: stale ranking có thể chấp nhận nhưng stale access control thì không. Tách durability khỏi visibility; event durable có thể chưa hiện trong materialized view.',
-        exercises: ['Ước lượng QPS, egress và storage một năm cho feed với assumption thấp, expected và cao.', 'Tạo budget 250 millisecond cho request có bốn remote dependency và model một dependency dùng gấp đôi allocation.', 'Phân loại consistency cho publish, follow, block, like count, ranking và delete rồi bảo vệ từng lựa chọn.'],
-      },
-    }),
-    section({
+    },
+    {
       id: 'data-modeling-storage',
       title: { en: 'Data modeling & storage choice', vn: 'Mô hình dữ liệu và lựa chọn storage' },
       baseline: {
@@ -196,40 +475,235 @@ export const systemDesign = {
         en: ['Choose storage from invariants and query patterns', 'Design keys, indexes, partitions, and retention together', 'Plan schema evolution and repairable derived data'],
         vn: ['Chọn storage từ invariant và query pattern', 'Thiết kế key, index, partition và retention cùng nhau', 'Lập kế hoạch schema evolution và derived data có thể repair'],
       },
-      en: {
-        subject: 'data modeling and storage selection',
-        system: 'an online checkout and order service',
-        metric: 'committed orders per second without duplicate charges or overselling',
-        invariant: 'one accepted checkout creates at most one charge and one durable order',
-        artifact: 'an access-pattern table plus an entity and invariant model',
-        example: 'submitting a cart and viewing the resulting order',
-        decision: 'which changes share a transaction and which become asynchronous derived views',
-        failure: 'a hot product, online migration, or lagging replica changing the expected access pattern',
-        proof: 'constraints, query plans, partition distribution, and reconciliation should demonstrate correctness and sustainable cost',
-        why: 'Storage choice determines which guarantees are easy, which queries are cheap, and which failures a team owns. Starting with a fashionable database reverses the reasoning. Checkout has hard invariants around order identity, money, and inventory, plus derived needs such as search, email, analytics, and dashboards. One store rarely needs to serve all of them. A sound model keeps authoritative transitions simple and makes secondary views rebuildable.',
-        mental: 'Model invariants before tables. List entities, stable identifiers, lifecycle states, ownership, and legal transitions. Then list access patterns with key, filter, sort, cardinality, frequency, freshness, and consistency. Select a source of truth that naturally enforces the hardest invariant. Add indexes for known reads and derived stores for incompatible patterns. Relational storage is often a sensible checkout default because uniqueness and transactions are valuable; search and warehouse views can consume committed events without becoming authoritative.',
-        walkthrough: 'Define Customer, Cart, CheckoutAttempt, Order, PaymentAttempt, Reservation, and OrderLine. Store money as integer minor units with currency. Give Order explicit states and enforce legal transitions in one path. Put unique constraints on idempotency scope and provider reference. Model reservation quantity, expiry, and version so a conditional update prevents negative stock. Enumerate queries before indexes. Commit an outbox row with the order, then build email, search, and analytics from events. Partition only when volume or isolation requires it, and define retention separately for payment evidence, personal data, and ephemeral carts.',
-        pitfalls: 'Normalization is not automatically slow, and denormalization is not automatically scalable. Every duplicate field creates synchronization and repair work. Indexes improve reads but amplify writes and storage. Random IDs improve distribution but may hurt locality; sequential IDs can reveal volume or concentrate load. NoSQL moves schema enforcement rather than removing schema. Avoid dual writes without an outbox or reconciliation path, and do not shard early merely because a future product might be large.',
-        exercises: ['Model checkout entities and five invariants; show whether each uses a constraint, transaction, conditional write, or reconciliation.', 'Build an access-pattern table for order history, fulfillment, payment reconciliation, and analytics.', 'Design a zero-downtime migration from one address string to structured fields while old and new app versions coexist.'],
+      diagram: 'data-modeling-storage',
+      body: {
+        en: `## Analysis
+
+Choose storage from **invariants and access patterns**, not from a product category or trend. Start by listing entities, stable identifiers, ownership, lifecycle states, and legal transitions. Then list every required read and write with key, filters, sort order, cardinality, frequency, freshness, and consistency.
+
+For checkout, the hard questions concern money, order identity, and inventory. Search, email, analytics, and dashboards are derived needs. One database does not need to serve every shape, but one system must remain the source of truth.
+
+Write the model in domain language first. Physical schemas should implement that model, not quietly redefine it around a storage product’s limitations.
+
+## Requirements
+
+State invariants before schemas:
+
+- One idempotent checkout creates at most one order.
+- A provider payment reference belongs to one payment attempt.
+- Money uses integer minor units plus currency.
+- Inventory never commits below zero.
+- Order state follows explicit legal transitions.
+- Personal and financial data follow separate retention rules.
+
+Specify expected write volume, read queries, transaction size, growth, delete rate, and restore requirements. Identify which reads tolerate replica lag and which must observe the latest committed state.
+
+## Features
+
+Model core entities such as **Customer, Cart, CheckoutAttempt, Order, OrderLine, PaymentAttempt, Reservation**, and OutboxEvent. Avoid turning every noun into a table without behavior.
+
+Define common queries before indexes:
+
+- Fetch an order by ID and owner.
+- List recent orders by customer.
+- Find pending payment attempts for reconciliation.
+- Claim expiring inventory reservations.
+- Retrieve fulfillment work by status.
+
+Search and analytics can consume committed events into rebuildable projections. They must not silently become authoritative.
+
+## Tech choices
+
+A relational database is often the simplest checkout source of truth because transactions, foreign keys, and unique constraints make critical invariants direct. A document store fits aggregate reads when cross-document invariants are limited. A wide-column or key-value store fits huge predictable key access, but secondary access and transactions need explicit solutions.
+
+Choose IDs deliberately. Sequential IDs improve locality but reveal volume and can concentrate writes. Random IDs distribute writes but use larger indexes and reduce locality. Time-sortable random IDs are a compromise, *not a substitute for partition analysis*.
+
+## Design
+
+Keep the authoritative transaction small:
+
+1. Validate request and lock or conditionally update required rows.
+2. Create or reuse CheckoutAttempt by idempotency scope.
+3. Create Order and reservation state.
+4. Insert an outbox event in the same transaction.
+5. Commit; publish derived work later.
+
+Partition only after measured size, throughput, isolation, or maintenance requires it. Pick a key aligned with dominant access, and plan rebalancing. Customer-based partitioning helps order history but can create hot enterprise tenants; order-based hashing spreads load but complicates customer lists.
+
+## Code
+
+Use database constraints as executable invariants:
+
+~~~sql
+CREATE TABLE payment_attempts (
+  id uuid PRIMARY KEY,
+  account_id uuid NOT NULL,
+  idempotency_key text NOT NULL,
+  provider_ref text,
+  amount_minor bigint NOT NULL CHECK (amount_minor >= 0),
+  currency char(3) NOT NULL,
+  status text NOT NULL,
+  UNIQUE (account_id, idempotency_key),
+  UNIQUE (provider_ref)
+);
+
+UPDATE inventory
+SET available = available - :qty
+WHERE sku = :sku AND available >= :qty;
+~~~
+
+The affected-row count decides whether reservation succeeded. A prior application read followed by an unconditional write is race-prone.
+
+## Deploy
+
+Use expand-and-contract migrations:
+
+- Add nullable columns or new tables first.
+- Deploy code that writes old and new representations when necessary.
+- Backfill in bounded batches with checkpoints and rate limits.
+- Compare results and switch reads gradually.
+- Remove old fields only after all clients and rollback windows expire.
+
+Monitor lock time, replica lag, query plans, index growth, and backfill errors. Test restore and reconciliation, not only backup creation.
+
+## Trade-offs
+
+- Normalization reduces duplicated truth but may require joins.
+- Denormalization speeds known reads but creates synchronization and repair.
+- More indexes improve reads while amplifying writes and storage.
+- Strong transactions simplify invariants but constrain partitioning.
+- Derived stores support incompatible queries but add lag and replay work.
+
+Choose the simplest source that enforces the hardest invariant. Add specialized stores only for measured access patterns.
+
+## Failure modes
+
+Common failures are:
+
+- Dual-writing database and broker without an outbox or reconciliation.
+- Treating NoSQL as “schema-free.”
+- Using a read replica for a read-after-write workflow.
+- Missing uniqueness under concurrent requests.
+- Hot products or tenants overwhelming one partition.
+- Backfills taking long locks or competing with production traffic.
+- Deleting authoritative data before derived copies and backups.
+- Keeping a projection that cannot be rebuilt or repaired.
+
+Every mutation should answer: *what happens if the process stops after this statement?*
+
+## Practice
+
+1. Model checkout entities and five invariants. Map each to a constraint, transaction, conditional write, or reconciliation.
+2. Build an access-pattern table for order history, fulfillment, payment reconciliation, and analytics.
+3. Design a zero-downtime migration from one address string to structured fields.
+4. Compare customer-keyed and hash-keyed partitioning for one million orders per day.`,
+        vn: `## Phân tích
+
+Chọn storage từ **invariant và access pattern**, không từ trend. Liệt kê entity, stable identifier, owner, lifecycle state và legal transition. Sau đó ghi mỗi read/write với key, filter, sort, cardinality, frequency, freshness và consistency.
+
+Với checkout, câu hỏi khó nằm ở money, order identity và inventory. Search, email, analytics, dashboard là derived need. Một database không cần phục vụ mọi query shape, nhưng phải có một source of truth rõ.
+
+## Yêu cầu
+
+Nêu invariant trước schema:
+
+- Một idempotent checkout tạo tối đa một order.
+- Provider payment reference chỉ thuộc một attempt.
+- Money dùng integer minor unit kèm currency.
+- Inventory không commit dưới zero.
+- Order chỉ đi qua legal transition.
+- Personal và financial data có retention riêng.
+
+Ghi write volume, query, transaction size, growth, delete rate và restore target. Chỉ rõ read nào chịu replica lag.
+
+## Tính năng
+
+Model Customer, Cart, CheckoutAttempt, Order, OrderLine, PaymentAttempt, Reservation và OutboxEvent. Liệt kê query trước index: order by ID, recent orders by customer, pending payment để reconcile, expiring reservation và fulfillment theo status.
+
+Search, email và analytics consume committed event vào projection rebuild được; chúng không trở thành authoritative.
+
+## Công nghệ
+
+Relational database thường là source of truth đơn giản nhất vì transaction, foreign key và unique constraint. Document store hợp aggregate read khi ít cross-document invariant. Key-value store hợp predictable key access rất lớn nhưng secondary access phải được giải quyết rõ.
+
+Sequential ID tăng locality nhưng lộ volume; random ID phân tán write nhưng index lớn. Time-sortable random ID chỉ là compromise, *không thay partition analysis*.
+
+## Thiết kế
+
+Authoritative transaction:
+
+1. Validate và conditional update state.
+2. Create hoặc reuse CheckoutAttempt theo idempotency scope.
+3. Create Order và reservation.
+4. Insert outbox event cùng transaction.
+5. Commit rồi publish derived work.
+
+Chỉ partition khi size, throughput hoặc isolation đo được yêu cầu. Customer key giúp order history nhưng hot tenant; hash order key trải load nhưng list theo customer khó hơn.
+
+## Code
+
+~~~sql
+CREATE TABLE payment_attempts (
+  id uuid PRIMARY KEY,
+  account_id uuid NOT NULL,
+  idempotency_key text NOT NULL,
+  provider_ref text UNIQUE,
+  amount_minor bigint CHECK (amount_minor >= 0),
+  currency char(3) NOT NULL,
+  UNIQUE (account_id, idempotency_key)
+);
+
+UPDATE inventory
+SET available = available - :qty
+WHERE sku = :sku AND available >= :qty;
+~~~
+
+Affected-row count quyết định reservation; read rồi unconditional write có race.
+
+## Deploy
+
+Dùng expand-and-contract:
+
+- Add nullable field hoặc table.
+- Deploy writer tương thích old/new.
+- Backfill bounded batch có checkpoint.
+- Compare rồi shift read.
+- Chỉ remove old field sau rollback window.
+
+Monitor lock, replica lag, query plan, index growth và backfill error. Test restore cùng reconciliation.
+
+## Trade-offs
+
+- Normalization giảm duplicate truth nhưng cần join.
+- Denormalization tăng read speed nhưng tạo repair.
+- Index cải thiện read và amplify write.
+- Transaction đơn giản hóa invariant nhưng hạn chế partition.
+- Derived store hỗ trợ query khác nhưng thêm lag.
+
+Chọn source đơn giản nhất enforce invariant khó nhất.
+
+## Phân tích lỗi
+
+- Dual write database và broker thiếu outbox.
+- Xem NoSQL là schema-free.
+- Dùng replica cho read-after-write.
+- Thiếu uniqueness khi concurrent request.
+- Hot tenant overload partition.
+- Backfill lock production.
+- Delete source trước derived copy và backup.
+- Projection không rebuild được.
+
+Mọi mutation phải trả lời: *process dừng sau statement này thì sao?*
+
+## Practice
+
+1. Model checkout entity và năm invariant; map sang constraint, transaction, conditional write hoặc reconciliation.
+2. Lập access-pattern table cho order, fulfillment, payment và analytics.
+3. Thiết kế migration từ address string sang structured field.
+4. So sánh customer-key và hash-key partitioning.`,
       },
-      vn: {
-        subject: 'data modeling và storage selection',
-        system: 'checkout và order service online',
-        metric: 'committed order mỗi giây mà không duplicate charge hoặc oversell',
-        invariant: 'một accepted checkout tạo tối đa một charge và một durable order',
-        artifact: 'access-pattern table cùng entity và invariant model',
-        example: 'submit cart rồi xem resulting order',
-        decision: 'change nào share transaction và change nào thành async derived view',
-        failure: 'hot product, online migration hoặc lagging replica làm đổi expected access pattern',
-        proof: 'constraint, query plan, partition distribution và reconciliation phải chứng minh correctness và sustainable cost',
-        why: 'Storage choice quyết định guarantee nào dễ, query nào rẻ và failure nào team phải sở hữu. Bắt đầu bằng database đang thịnh hành là đảo ngược reasoning. Checkout có hard invariant quanh order identity, money và inventory, cộng derived need như search, email, analytics và dashboard. Một store hiếm khi cần phục vụ tất cả. Model tốt giữ authoritative transition đơn giản và làm secondary view rebuild được.',
-        mental: 'Model invariant trước table. Liệt kê entity, stable identifier, lifecycle state, ownership và legal transition. Sau đó liệt kê access pattern với key, filter, sort, cardinality, frequency, freshness và consistency. Chọn source of truth enforce tự nhiên invariant khó nhất. Thêm index cho known read và derived store cho incompatible pattern. Relational storage thường là default hợp lý cho checkout vì uniqueness và transaction có giá trị; search và warehouse view có thể consume committed event mà không thành authoritative.',
-        walkthrough: 'Định nghĩa Customer, Cart, CheckoutAttempt, Order, PaymentAttempt, Reservation và OrderLine. Lưu money bằng integer minor unit kèm currency. Cho Order state rõ và enforce legal transition ở một path. Đặt unique constraint trên idempotency scope và provider reference. Model reservation quantity, expiry và version để conditional update ngăn negative stock. Liệt kê query trước index. Commit outbox row cùng order rồi build email, search và analytics từ event. Chỉ partition khi volume hoặc isolation yêu cầu, và định nghĩa retention riêng cho payment evidence, personal data và ephemeral cart.',
-        pitfalls: 'Normalization không tự động chậm, denormalization không tự động scalable. Mọi duplicate field tạo synchronization và repair work. Index cải thiện read nhưng amplify write và storage. Random ID tăng distribution nhưng có thể giảm locality; sequential ID có thể lộ volume hoặc tập trung load. NoSQL chuyển schema enforcement chứ không loại schema. Tránh dual write nếu thiếu outbox hoặc reconciliation path, và đừng shard sớm chỉ vì future product có thể lớn.',
-        exercises: ['Model checkout entity và năm invariant; nêu mỗi invariant dùng constraint, transaction, conditional write hay reconciliation.', 'Lập access-pattern table cho order history, fulfillment, payment reconciliation và analytics.', 'Thiết kế zero-downtime migration từ một address string sang structured field khi app version cũ và mới cùng chạy.'],
-      },
-    }),
-    section({
+    },
+    {
       id: 'caching',
       title: { en: 'Caching', vn: 'Caching' },
       baseline: {
@@ -240,40 +714,232 @@ export const systemDesign = {
         en: ['Choose cache placement, key, and invalidation policy', 'Protect origins from stampedes and hot keys', 'Measure cache value and correctness risk'],
         vn: ['Chọn cache placement, key và invalidation policy', 'Bảo vệ origin khỏi stampede và hot key', 'Đo cache value và correctness risk'],
       },
-      en: {
-        subject: 'caching',
-        system: 'the redirect path of a URL shortener',
-        metric: 'origin load and redirect latency by cache-hit class',
-        invariant: 'a disabled malicious link stops resolving within the approved propagation window',
-        artifact: 'a cache contract covering keys, ownership, TTL, invalidation, and fallback',
-        example: 'resolving a popular short code at the edge',
-        decision: 'how much staleness to accept for lower origin latency and higher availability',
-        failure: 'a cold restart, synchronized expiry, hot key, poisoned value, or invalidation outage',
-        proof: 'origin requests saved, stale serves, eviction rate, and tail latency must show value; hit ratio alone is insufficient',
-        why: 'Caching intentionally creates another copy of data. That copy can reduce latency, absorb bursts, and shield expensive storage, but it introduces staleness, invalidation, and uneven load. Ask which operation has enough reuse to justify a copy, how wrong the copy may be, and what happens when it disappears. URL redirects are strong candidates because reads dominate and mappings change rarely, but abuse revocation makes freshness a real product constraint.',
-        mental: 'Treat a cache as a bounded, lossy materialized view. Define source of truth, key namespace, value schema, freshness contract, admission, eviction, and miss behavior. Place it where it removes repeated cost: browser, CDN, process, distributed cache, or database buffer. Cache-aside keeps the read path simple; write-through adds cache coordination to writes; write-behind adds data-loss risk and should not casually own authoritative state.',
-        walkthrough: 'Key redirects by normalized code plus tenant or domain. Cache destination, status, and expiry. Use brief edge caching and a longer regional cache. Coalesce concurrent misses, add TTL jitter, and negative-cache nonexistent codes only briefly. Disable a link in the source of truth first, publish invalidation, and keep maximum TTL within the harm window. Sensitive revocation may need a synchronous denylist. During cache failure, rate-limit and shed low-value traffic so origin survives. Warm proven hot keys only, then monitor each layer and key class.',
-        pitfalls: 'A high hit ratio may save only cheap reads while rare misses trigger expensive work. TTL is not enough for immediate revocation, while aggressive invalidation can become a fragile protocol. Unbounded local caches cause memory pressure and instance inconsistency. Never cache authorization without identity, policy version, and revocation semantics. Hot keys can saturate one shard despite low total usage. A cache should be optional for correctness unless deliberately operated as source of truth.',
-        exercises: ['Design a two-level redirect cache with keys, values, TTLs, jitter, negative caching, invalidation, and failure behavior.', 'Explain a 95 percent feed-cache hit ratio with rising database CPU and propose one bounded measurement.', 'Design malicious-link revocation that completes within ten seconds when the invalidation stream is unavailable.'],
+      diagram: 'caching',
+      body: {
+        en: `## Analysis
+
+A cache is a **bounded, lossy copy** of data. It can reduce latency, absorb bursts, and protect an expensive origin, but it creates staleness, invalidation, and uneven load. First ask whether repeated reads are expensive enough and reusable enough to justify another copy.
+
+Define the cache contract: source of truth, key, value schema, freshness, admission, eviction, miss behavior, and owner. A high hit ratio is not enough; measure origin work saved and correctness risk.
+
+Compare the system with and without caching. If removing the cache breaks correctness rather than only performance or availability, it has become authoritative and needs durability, recovery, and stronger operational ownership. Make that escalation explicit instead of discovering it during an outage.
+
+## Requirements
+
+For each cached operation, specify:
+
+- Maximum acceptable staleness and revocation time.
+- Key namespace, tenant scope, and normalization.
+- Value size and sensitive-data policy.
+- Expected reuse, working-set size, and skew.
+- Behavior on miss, timeout, corruption, and total cache loss.
+- Whether stale data may be served during origin failure.
+
+For URL redirects, a disabled malicious link might need to stop within ten seconds. That requirement bounds TTL or requires invalidation and a denylist.
+
+## Features
+
+Useful cache capabilities include:
+
+- **Cache-aside** reads for simple ownership.
+- Positive caching for valid mappings.
+- Brief negative caching for missing codes.
+- Request coalescing for concurrent misses.
+- TTL jitter to avoid synchronized expiry.
+- Admission control so one-off data does not evict useful entries.
+- Explicit invalidation for edits and revocation.
+- Per-layer metrics for edge, local, and distributed caches.
+
+Warm only proven hot data. Bulk warming an assumed working set can overload the origin before users arrive.
+
+## Tech choices
+
+Place caches where they remove cost:
+
+- Browser or CDN: lowest latency, least revocation control.
+- Process-local: fast and cheap, but inconsistent across instances.
+- Distributed cache: shared view, network hop, separate failure domain.
+- Database buffer: automatic but not an application freshness contract.
+
+Cache-aside keeps writes simple. Write-through coordinates every write with cache. Write-behind can lose data and should not casually own authoritative state. Prefer the least complex policy that meets freshness.
+
+## Design
+
+For redirects, key by normalized domain or tenant plus short code. Store destination, status, expiry, and a schema or policy version. On miss:
+
+1. Coalesce requests for the same key.
+2. Read the source or a replica with acceptable lag.
+3. Validate status and expiry.
+4. Fill with TTL plus random jitter.
+5. Return the result and release waiting requests.
+
+Disable in the source of truth first, then publish invalidation. A synchronous denylist can protect high-risk revocation while ordinary mappings use bounded TTL. During cache loss, rate-limit origin concurrency and shed low-value work.
+
+## Code
+
+~~~js
+async function resolve(code) {
+  const key = "redirect:" + normalize(code);
+  const cached = await cache.get(key);
+  if (cached) return cached;
+
+  return singleFlight(key, async () => {
+    const link = await store.findActive(code);
+    if (!link) {
+      await cache.set(key, { missing: true }, { ttl: 5 });
+      return null;
+    }
+    await cache.set(key, link, { ttl: 300 + random(0, 60) });
+    return link;
+  });
+}
+~~~
+
+Real code must distinguish a cached negative result from an ordinary miss and cap waiting callers.
+
+## Deploy
+
+Introduce caching with shadow measurements first: record would-hit keys and expected origin savings without serving cached values. Then canary by traffic percentage or key namespace. Verify old and new value schemas coexist during deployment.
+
+Plan cold starts and cache replacement. Limit warmer concurrency, keep database connection budgets, and test complete cache loss under peak traffic. Roll out invalidation producers before relying on consumers, and preserve TTL as a safety bound.
+
+## Trade-offs
+
+- Longer TTL improves hit rate but increases stale exposure.
+- More cache layers reduce latency but complicate ownership and invalidation.
+- Negative caching protects origins but can hide newly created data.
+- Local caches remove a network hop but multiply memory and inconsistency.
+- Replicating hot keys improves throughput but increases invalidation fan-out.
+
+Make the cache optional for correctness unless the product deliberately treats it as authoritative.
+
+## Failure modes
+
+Design for:
+
+- **Stampede** after expiry or cold restart.
+- A viral **hot key** saturating one shard or network path.
+- Cache poisoning or incompatible value schema.
+- An invalidation event lost or delayed.
+- Eviction churn from oversized or one-use values.
+- Cache timeout consuming the full request deadline.
+- Authorization cached without identity or policy version.
+- Fail-open behavior serving a disabled destination.
+
+Track hit and miss latency, origin requests saved, stale serves, eviction, memory, hot-key distribution, and invalidation age.
+
+## Practice
+
+1. Design a two-level redirect cache with keys, values, TTL, jitter, negative caching, and invalidation.
+2. Explain how a 95% hit ratio can coexist with rising database CPU.
+3. Design ten-second malicious-link revocation when the invalidation stream is down.
+4. Run a failure walkthrough for cold cache, one hot key, corrupt values, and slow origin.`,
+        vn: `## Phân tích
+
+Cache là **copy có giới hạn và có thể mất**. Nó giảm latency, hấp thụ burst và bảo vệ origin, nhưng tạo staleness, invalidation và uneven load. Chỉ cache khi repeated read đủ đắt và có reuse.
+
+Cache contract phải nêu source of truth, key, value schema, freshness, admission, eviction, miss behavior và owner. Hit ratio cao chưa chứng minh value.
+
+## Yêu cầu
+
+- Maximum staleness và revocation time.
+- Key namespace, tenant scope, normalization.
+- Value size và sensitive-data policy.
+- Working set, reuse và skew.
+- Behavior khi miss, timeout, corruption hoặc total loss.
+- Có serve stale khi origin down không.
+
+Với redirect, malicious link phải dừng trong mười giây; requirement này giới hạn TTL hoặc đòi invalidation/denylist.
+
+## Tính năng
+
+- **Cache-aside** cho read đơn giản.
+- Positive và brief negative caching.
+- Request coalescing cho concurrent miss.
+- TTL jitter chống synchronized expiry.
+- Admission control bảo vệ working set.
+- Explicit invalidation cho edit và revoke.
+- Metric riêng cho edge, local, distributed layer.
+
+Chỉ warm hot data đã được chứng minh.
+
+## Công nghệ
+
+- Browser/CDN: latency thấp nhất, revocation control thấp.
+- Local cache: nhanh nhưng instance không đồng nhất.
+- Distributed cache: shared view, thêm network hop.
+- Database buffer: tự động nhưng không là freshness contract.
+
+Write-through thêm coordination; write-behind có data-loss risk. Chọn policy đơn giản nhất đáp ứng freshness.
+
+## Thiết kế
+
+Key redirect bằng normalized domain hoặc tenant cộng short code. Value gồm destination, status, expiry, schema version. Khi miss:
+
+1. Coalesce cùng key.
+2. Read source hoặc replica phù hợp.
+3. Check status và expiry.
+4. Fill với TTL có jitter.
+5. Trả result cho waiting request.
+
+Disable source of truth trước rồi publish invalidation. Denylist synchronous bảo vệ high-risk revocation. Khi cache mất, bound origin concurrency.
+
+## Code
+
+~~~js
+async function resolve(code) {
+  const key = "redirect:" + normalize(code);
+  const cached = await cache.get(key);
+  if (cached) return cached;
+  return singleFlight(key, async () => {
+    const link = await store.findActive(code);
+    if (!link) return cacheNegative(key, 5);
+    await cache.set(key, link, { ttl: 300 + random(0, 60) });
+    return link;
+  });
+}
+~~~
+
+Implementation thật phải phân biệt negative result với miss và cap waiting caller.
+
+## Deploy
+
+Shadow measurement trước khi serve cache. Sau đó canary theo traffic hoặc namespace. Old/new value schema phải coexist.
+
+Test cold start và complete cache loss ở peak. Limit warmer concurrency. Deploy invalidation producer trước consumer và giữ TTL làm safety bound.
+
+## Trade-offs
+
+- TTL dài tăng hit nhưng tăng stale.
+- Nhiều layer giảm latency nhưng invalidation khó.
+- Negative cache bảo vệ origin nhưng che new data.
+- Local cache giảm network nhưng nhân memory.
+- Replicate hot key tăng throughput và invalidation fan-out.
+
+Cache nên optional cho correctness.
+
+## Phân tích lỗi
+
+- Stampede sau expiry.
+- Viral **hot key** overload shard.
+- Poisoned hoặc incompatible value.
+- Lost invalidation.
+- Eviction churn.
+- Cache timeout dùng hết deadline.
+- Authorization cache thiếu identity/policy version.
+- Fail-open serve disabled destination.
+
+Track origin request saved, stale serve, eviction, hot-key distribution và invalidation age.
+
+## Practice
+
+1. Thiết kế redirect cache hai tầng.
+2. Giải thích hit ratio 95% nhưng database CPU tăng.
+3. Thiết kế revocation mười giây khi invalidation stream down.
+4. Walk cold cache, hot key, corrupt value và slow origin.`,
       },
-      vn: {
-        subject: 'caching',
-        system: 'redirect path của URL shortener',
-        metric: 'origin load và redirect latency theo cache-hit class',
-        invariant: 'malicious link đã disable ngừng resolve trong approved propagation window',
-        artifact: 'cache contract bao gồm key, ownership, TTL, invalidation và fallback',
-        example: 'resolve popular short code ở edge',
-        decision: 'chấp nhận bao nhiêu staleness để đổi lower origin latency và higher availability',
-        failure: 'cold restart, synchronized expiry, hot key, poisoned value hoặc invalidation outage',
-        proof: 'origin request tiết kiệm, stale serve, eviction rate và tail latency phải chứng minh value; hit ratio riêng là chưa đủ',
-        why: 'Caching cố ý tạo thêm một copy dữ liệu. Copy đó giảm latency, hấp thụ burst và che expensive storage, nhưng tạo staleness, invalidation và uneven load. Hãy hỏi operation nào có đủ reuse để đáng copy, copy được sai đến đâu và chuyện gì xảy ra khi nó biến mất. URL redirect là ứng viên mạnh vì read áp đảo và mapping ít đổi, nhưng abuse revocation biến freshness thành product constraint thật.',
-        mental: 'Xem cache là bounded, lossy materialized view. Định nghĩa source of truth, key namespace, value schema, freshness contract, admission, eviction và miss behavior. Đặt nó nơi loại repeated cost: browser, CDN, process, distributed cache hoặc database buffer. Cache-aside giữ read path đơn giản; write-through thêm cache coordination vào write; write-behind thêm data-loss risk và không nên tùy tiện giữ authoritative state.',
-        walkthrough: 'Key redirect bằng normalized code cộng tenant hoặc domain. Cache destination, status và expiry. Dùng brief edge caching và regional cache lâu hơn. Coalesce concurrent miss, thêm TTL jitter và negative-cache code không tồn tại thật ngắn. Disable link ở source of truth trước, publish invalidation và giữ maximum TTL trong harm window. Sensitive revocation có thể cần synchronous denylist. Khi cache failure, rate-limit và shed low-value traffic để origin sống. Chỉ warm proven hot key rồi monitor từng layer và key class.',
-        pitfalls: 'Hit ratio cao có thể chỉ tiết kiệm cheap read còn rare miss kích hoạt expensive work. TTL không đủ cho immediate revocation, còn aggressive invalidation có thể thành fragile protocol. Unbounded local cache gây memory pressure và inconsistency giữa instance. Đừng cache authorization nếu thiếu identity, policy version và revocation semantic. Hot key có thể saturate một shard dù total usage thấp. Cache nên optional cho correctness trừ khi được chủ ý operate như source of truth.',
-        exercises: ['Thiết kế redirect cache hai tầng với key, value, TTL, jitter, negative caching, invalidation và failure behavior.', 'Giải thích feed-cache hit ratio 95 phần trăm nhưng database CPU tăng và đề xuất một bounded measurement.', 'Thiết kế malicious-link revocation hoàn tất trong mười giây khi invalidation stream không available.'],
-      },
-    }),
-    section({
+    },
+    {
       id: 'url-shortener',
       title: { en: 'Build a URL Shortener', vn: 'Xây dựng hệ thống rút gọn URL' },
       baseline: {
@@ -284,54 +950,250 @@ export const systemDesign = {
         en: ['Design short-link creation and low-latency redirect paths', 'Compare base62 encoding with hash-based key generation', 'Model uniqueness, collision handling, and custom alias constraints', 'Plan caching, rate limiting, analytics, and horizontal scaling', 'Defend 301 versus 302 redirect behavior using product requirements'],
         vn: ['Thiết kế luồng tạo liên kết ngắn và chuyển hướng có độ trễ thấp', 'So sánh mã hóa base62 với cách tạo khóa dựa trên hàm băm', 'Mô hình hóa tính duy nhất, xử lý va chạm và ràng buộc alias tùy chỉnh', 'Lập kế hoạch cho caching, giới hạn tốc độ, analytics và mở rộng ngang', 'Lựa chọn giữa chuyển hướng 301 và 302 dựa trên yêu cầu sản phẩm'],
       },
-      en: {
-        subject: 'an end-to-end URL-shortening service',
-        system: 'a read-heavy service that creates durable short-code mappings and resolves them with low latency',
-        metric: 'successful redirect availability and p99 server latency, separated by cache hit and storage fallback',
-        invariant: 'each normalized active short code maps to exactly one destination and concurrent claims cannot both succeed',
-        artifact: 'a capacity sheet, data model, creation sequence, redirect sequence, and failure table with measurable operating limits',
-        example: 'creating a campaign link and following it during a sudden viral traffic burst',
-        decision: 'whether links are mutable and analytics-sensitive enough to require 302, or immutable enough to benefit from cacheable 301 responses',
-        failure: 'a viral code becoming a hot key while cache nodes restart, storage slows, and click-event consumers lag',
-        proof: 'conditional-insert concurrency tests, skewed load tests, cache-loss drills, and redirect latency histograms should demonstrate uniqueness and bounded degradation',
-        why: 'A URL shortener is compact enough to reason about in one review yet broad enough to exercise the core system-design muscles. Its visible journeys are simple: create a short link, follow it, optionally claim a memorable alias, and inspect delayed usage statistics. Behind those journeys are concrete choices about API contracts, key generation, durable storage, cache freshness, abuse controls, and asynchronous events. Begin by declaring scope. Editing destinations, expiration, preview pages, malware review, deletion, and multi-region writes are not free extensions; each changes the consistency or operational model and may be an explicit non-goal for the first release. The workload is usually read-heavy, so redirect availability and tail latency dominate, while creation can tolerate more validation and coordination. Use stated targets rather than folklore: creations and redirects per second, peak-to-average ratio, maximum URL size, retention, p99 latency, availability, revocation window, and acceptable probability of exhausting collision retries. Those targets determine whether one relational database and cache are sufficient or whether partitioning and regional replicas are justified.',
-        mental: 'Split the system into a deliberate write path and a minimal read path. The write path validates an http or https destination, authenticates or classifies the caller, applies a creation rate limit, reserves a code, and persists one authoritative mapping. The read path accepts a normalized code, finds that mapping, checks status and expiry, and returns a redirect without waiting for analytics. Model the source of truth as a key-value relation even when implemented in SQL: `links(short_code PRIMARY KEY, long_url, created_at, owner_id, expires_at, status, code_kind)` with indexes only for supported management queries. `short_code` is the canonical generated code or custom alias; `code_kind` records how it was assigned without creating a second namespace. Key generation is a separate decision. Base62 reversibly represents an assigned integer in a short alphabet; it is encoding, not encryption, and sequential IDs may reveal volume or make enumeration easier. A random token or truncated hash avoids a central sequence but occupies a probabilistic key space and therefore needs collision handling. Hashing the destination can accidentally impose deduplication semantics and still collides when truncated. In every strategy, a database unique constraint or atomic conditional insert enforces the invariant. An application-level check followed by insert does not. Custom aliases enter the same namespace after case normalization, Unicode policy, reserved-word checks, and atomic reservation.',
-        walkthrough: 'For `POST /links`, validate scheme and length, reject disallowed or clearly abusive input according to policy, and apply stricter per-account limits to authenticated creation and per-IP limits to anonymous creation than to redirects. If the product uses assigned IDs, obtain a database sequence or distributed unique integer, encode it with the 62 characters `0-9A-Za-z`, then insert the mapping. At very high write scale, allocate ID ranges or use a distributed ID generator, but accept that coordination and information leakage are trade-offs rather than assuming base62 solves distribution. For random or hash-derived candidates, attempt a conditional insert such as `INSERT ... ON CONFLICT DO NOTHING`; on conflict generate another candidate, retry a bounded number of times, record the rate, and fail explicitly if the budget is exhausted. A custom alias bypasses encoding but not normalization or the unique constraint; two simultaneous claims yield one success and one clear 409 conflict. An idempotency key can keep a client retry from creating several links. For `GET /{short_code}`, the edge or load balancer applies a generous abuse limit and routes to stateless redirect instances. The service checks a distributed cache for destination, status, and expiry. On a miss it reads the primary or a replica whose staleness is compatible with activation and revocation guarantees, fills the cache with TTL and jitter, and returns 301 or 302. Unknown codes may be negative-cached briefly. Click data is emitted to a durable queue on a best-effort or transactional-outbox policy chosen explicitly; aggregation, bot filtering, and analytics storage remain off the redirect latency path. Scale application instances horizontally, replicate hot cache entries, coalesce misses, bound database connections, and partition durable mappings by a stable hash of `short_code` only after measured storage or throughput requires it.',
-        pitfalls: 'The redirect status is a product decision, not a cosmetic HTTP detail. A 301 communicates permanence and can let browsers and CDNs answer future navigations without reaching the service, reducing load and potentially helping canonicalization. That same caching makes destination edits and rapid abuse revocation harder and causes request-level click analytics to undercount. A 302 preserves control for mutable campaign links and keeps more visits observable, but sends more traffic through the service. Document cache headers with the status instead of assuming every intermediary behaves identically. Cache hit ratio alone does not prove safety: one viral code can overload a shard, synchronized expiry can stampede storage, and a long TTL can keep a disabled destination alive. Use request coalescing, TTL jitter, replication or small local/edge copies for proven hot keys, and an invalidation or denylist path whose propagation matches the harm window. Do not call a six-character token secure merely because it looks random; quantify the base62 space, birthday-collision risk, enumeration threat, and typo or case-sensitivity cost. Do not use unbounded collision retries or check-then-insert alias claims. Separate creation rate limits, which protect a scarce namespace and abuse-review capacity, from redirect limits, where aggressive blocking can harm legitimate viral traffic. Finally, asynchronous analytics is not magical losslessness: define event IDs, duplicate handling, sampling, queue backpressure, retention, privacy, and what happens when publishing fails, without turning a dashboard outage into redirect downtime.',
-        exercises: [
-          'Estimate code-space capacity, peak QPS, bandwidth, and one-year mapping storage for a stated traffic profile, retention period, and safety margin.',
-          'Choose sequential ID plus base62, random tokens, or truncated hashes for three products with different scale, privacy, coordination, and deduplication requirements.',
-          'Complete a redirect failure table for cache outage, storage timeout, missing code, expired link, disabled link, queue outage, and one viral hot key.',
-          'Write collision-safe pseudocode for generated codes and for two concurrent custom-alias claims using a unique constraint or conditional insert.',
-          'Choose 301 or 302 for immutable documentation links, editable user links, and analytics-sensitive campaigns; include cache headers and revocation consequences.',
-          'Extend the design for regional traffic and state which region accepts writes, how codes remain unique, how replication lag affects new links, and how failover changes the guarantee.',
-        ],
+      diagram: 'url-shortener',
+      body: {
+        en: `## Analysis
+
+A URL shortener has a deliberate write path and a minimal read path. Creation validates a destination, reserves a code, and persists one authoritative mapping. Redirect accepts a normalized code, checks status and expiry, and responds without waiting for analytics.
+
+The workload is normally read-heavy, but skew matters more than the average: one viral code can dominate traffic. Define creation QPS, redirect QPS, peak factor, URL size, retention, p99 latency, availability, revocation window, and analytics freshness. Decide whether links are editable, expiring, private, custom, or globally writable.
+
+## Requirements
+
+Core behavior:
+
+- Create a short link for an HTTP or HTTPS destination.
+- Resolve active links with low latency.
+- Return explicit behavior for missing, expired, and disabled codes.
+- Atomically claim custom aliases after normalization.
+- Disable abusive links within a bounded propagation time.
+- Record click events without blocking redirects.
+
+The critical invariant is: **one normalized active short code maps to exactly one destination**. Two concurrent claims cannot both succeed. Define case sensitivity, Unicode policy, reserved words, maximum destination length, and whether an alias can ever be reused.
+
+## Features
+
+Split features by path:
+
+- Create: authentication, URL validation, rate limits, code allocation, idempotency.
+- Redirect: cache lookup, storage fallback, expiry and denylist check, HTTP response.
+- Management: list, disable, expire, or edit owned links.
+- Analytics: durable event, bot filtering, aggregation, privacy, retention.
+- Abuse: destination screening, reports, emergency revocation, audit.
+
+Creation limits protect namespace and review capacity. Redirect limits must tolerate legitimate viral traffic and should focus on infrastructure protection or obvious abuse.
+
+## Tech choices
+
+**Base62 is an encoding, not a key-generation algorithm.** It reversibly represents an already assigned integer using 62 symbols. A database sequence plus base62 guarantees uniqueness, but sequential IDs can reveal volume and make enumeration easier. Range allocation or a distributed ID service can scale writes at added coordination cost.
+
+A random token avoids a central sequence but uses a probabilistic key space. A truncated hash also collides and needs the same atomic insert-and-retry path. Hashing the destination may accidentally impose deduplication: identical destinations receive one code even when owners, expiry, or analytics should differ. Salting avoids that semantic but makes the hash little different from random generation.
+
+Every strategy still uses a **unique constraint or conditional insert**. Check-then-insert in application code is not concurrency-safe.
+
+## Design
+
+Store the mapping in SQL or another conditional-write store:
+
+~~~sql
+CREATE TABLE links (
+  short_code varchar(16) PRIMARY KEY,
+  long_url text NOT NULL,
+  owner_id uuid,
+  status varchar(16) NOT NULL,
+  code_kind varchar(16) NOT NULL,
+  created_at timestamptz NOT NULL,
+  expires_at timestamptz
+);
+~~~
+
+Creation flow:
+
+1. Authenticate or classify the caller; rate-limit.
+2. Validate scheme, length, and policy.
+3. Normalize a custom alias or generate a candidate.
+4. Atomically insert; on generated collision, retry with a strict bound.
+5. Return the canonical URL. Reuse an idempotency key for client retries.
+
+Redirect flow:
+
+1. Edge routes to a stateless redirect instance.
+2. Check emergency denylist and distributed cache.
+3. On miss, read a source whose lag meets activation and revocation guarantees.
+4. Fill cache with TTL and jitter; briefly negative-cache missing codes.
+5. Return redirect, then enqueue click analytics outside the latency path.
+
+## Code
+
+Collision-safe pseudocode:
+
+~~~js
+async function createLink(input, idempotencyKey) {
+  const existing = await findByIdempotency(input.owner, idempotencyKey);
+  if (existing) return existing;
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const code = input.alias
+      ? normalizeAlias(input.alias)
+      : randomBase62(8);
+    const inserted = await insertIfAbsent({ code, ...input, idempotencyKey });
+    if (inserted) return inserted;
+    if (input.alias) throw conflict("alias_taken");
+  }
+  throw unavailable("code_allocation_exhausted");
+}
+~~~
+
+The database must also uniquely constrain the idempotency scope. Retrying after an ambiguous timeout should return the original resource, not create another link.
+
+## Deploy
+
+Start with one write region, a relational mapping store, stateless redirect instances, and a distributed cache. Scale application instances horizontally and bound total database connections. Partition mappings by a stable hash of short code only when measured size or throughput requires it.
+
+Test with a skewed distribution, not uniform random keys. Pre-scale known campaigns, replicate proven hot entries at edge or process-local caches, coalesce misses, and add TTL jitter. During cache restart, cap origin concurrency so a stampede does not become a database outage.
+
+Roll out code-length or normalization changes compatibly. Readers must accept old and new codes before writers emit the new form.
+
+## Trade-offs
+
+**301 vs 302 is a product decision.**
+
+- **301 Moved Permanently** enables aggressive browser and CDN caching. It reduces service load, but destination edits and rapid abuse revocation become harder, and request-level analytics undercount because later navigation may bypass the service.
+- **302 Found** keeps the service in control for mutable or analytics-sensitive links. It supports faster changes and more observable visits, but every redirect costs service capacity.
+
+Specify Cache-Control with either status; intermediaries differ. Immutable documentation links may use 301 with long caching. Editable campaign links usually favor 302 or another temporary redirect with a bounded cache policy.
+
+Other trade-offs include sequential uniqueness *vs* enumeration, random distribution *vs* collision retries, longer TTL *vs* revocation, and durable analytics *vs* redirect isolation.
+
+## Failure modes
+
+- **Hot key**: one viral code saturates a cache shard or network path despite low fleet average.
+- **Stampede**: cache restart or synchronized expiry floods storage.
+- **Collision**: random or truncated-hash candidate already exists.
+- **Alias race**: two users claim the same normalized alias.
+- **Replica lag**: a new or disabled link appears stale.
+- **Queue outage**: click events lag or drop without affecting redirect.
+- **Poisoned cache**: wrong destination persists until invalidated.
+- **Enumeration**: predictable codes expose private or sensitive links.
+
+Use replication, local copies, request coalescing, bounded retries, atomic uniqueness, invalidation, and reconciliation. Do not call a six-character token secure merely because it looks random; calculate its 62⁶ space and threat model.
+
+## Practice
+
+1. Estimate code space, peak QPS, bandwidth, and one-year mapping storage.
+2. Choose sequence plus base62, random token, or truncated hash for three different products.
+3. Write a failure table for cache loss, storage timeout, expired code, queue outage, and viral hot key.
+4. Choose 301 or 302 for immutable docs, editable user links, and analytics campaigns.
+5. Extend to multiple regions and state where writes occur, how uniqueness holds, and what replication lag changes.`,
+        vn: `## Phân tích
+
+URL shortener có write path chủ đích và read path tối giản. Creation validate destination, reserve code và persist authoritative mapping. Redirect nhận normalized code, check status cùng expiry rồi response mà không chờ analytics.
+
+Workload thường read-heavy nhưng skew quan trọng hơn average: một viral code có thể chiếm phần lớn traffic. Định nghĩa creation/redirect QPS, peak, URL size, retention, p99, availability, revocation window và analytics freshness.
+
+## Yêu cầu
+
+- Create short link cho HTTP/HTTPS destination.
+- Resolve active link với latency thấp.
+- Behavior rõ cho missing, expired, disabled.
+- Atomically claim custom alias.
+- Disable abuse trong bounded time.
+- Ghi click event ngoài redirect path.
+
+Invariant: **một normalized active code map tới đúng một destination**. Hai concurrent claim không thể cùng success. Chốt case sensitivity, Unicode, reserved word, max URL và alias reuse.
+
+## Tính năng
+
+- Create: auth, validation, rate limit, allocation, idempotency.
+- Redirect: cache, storage fallback, expiry, denylist, HTTP response.
+- Management: list, disable, expire, edit.
+- Analytics: event, bot filter, aggregation, privacy.
+- Abuse: screening, report, emergency revocation, audit.
+
+Creation limit bảo vệ namespace; redirect limit phải chịu legitimate viral traffic.
+
+## Công nghệ
+
+**Base62 là encoding, không phải key generator.** Nó biểu diễn reversible một integer đã được cấp. Sequence cộng base62 đảm bảo unique nhưng có thể lộ volume và dễ enumerate. Distributed ID hoặc range allocation tăng scale nhưng thêm coordination.
+
+Random token tránh central sequence nhưng có collision probability. Truncated hash cũng collide và cần atomic insert/retry. Hash destination có thể vô tình deduplicate link dù owner, expiry, analytics khác nhau.
+
+Mọi strategy đều cần **unique constraint hoặc conditional insert**. Application check-then-insert không an toàn khi concurrent.
+
+## Thiết kế
+
+~~~sql
+CREATE TABLE links (
+  short_code varchar(16) PRIMARY KEY,
+  long_url text NOT NULL,
+  owner_id uuid,
+  status varchar(16) NOT NULL,
+  code_kind varchar(16) NOT NULL,
+  created_at timestamptz NOT NULL,
+  expires_at timestamptz
+);
+~~~
+
+Create: classify caller, validate URL, normalize/generate candidate, atomic insert, bounded retry, return canonical URL. Redirect: route tới stateless instance, check denylist và cache, fallback storage, fill cache có jitter, trả redirect, enqueue click event.
+
+## Code
+
+~~~js
+async function createLink(input, idempotencyKey) {
+  const existing = await findByIdempotency(input.owner, idempotencyKey);
+  if (existing) return existing;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const code = input.alias ? normalizeAlias(input.alias) : randomBase62(8);
+    const inserted = await insertIfAbsent({ code, ...input, idempotencyKey });
+    if (inserted) return inserted;
+    if (input.alias) throw conflict("alias_taken");
+  }
+  throw unavailable("code_allocation_exhausted");
+}
+~~~
+
+Database cũng phải unique theo idempotency scope.
+
+## Deploy
+
+Bắt đầu bằng single write region, relational store, stateless redirect và distributed cache. Bound tổng connection. Chỉ partition bằng stable hash của code khi throughput đo được yêu cầu.
+
+Load test bằng skewed key. Pre-scale campaign, replicate proven hot entry, coalesce miss, jitter TTL. Khi cache restart, cap origin concurrency. Reader phải hiểu old/new code trước khi writer emit format mới.
+
+## Trade-offs
+
+**301 và 302 là product decision.**
+
+- **301** cho browser/CDN cache mạnh, giảm load nhưng edit, abuse revocation và request analytics khó hơn.
+- **302** giữ control cho mutable hoặc analytics-sensitive link nhưng mọi visit đi qua service.
+
+Kèm Cache-Control rõ. Immutable docs có thể dùng 301; editable campaign thường dùng 302 hoặc temporary redirect với bounded cache.
+
+Trade-off khác: sequential uniqueness *vs* enumeration, random distribution *vs* collision retry, long TTL *vs* revocation.
+
+## Phân tích lỗi
+
+- Viral **hot key** overload cache shard.
+- Cache restart tạo stampede.
+- Random hoặc truncated hash collide.
+- Concurrent custom alias race.
+- Replica lag cho link mới hoặc disabled.
+- Queue outage làm analytics lag.
+- Poisoned cache giữ wrong destination.
+- Predictable code bị enumerate.
+
+Dùng replication, local copy, coalescing, bounded retry, atomic uniqueness, invalidation và reconciliation. Token sáu ký tự không tự động secure; phải tính 62⁶ space và threat model.
+
+## Practice
+
+1. Ước lượng code space, peak QPS, bandwidth và storage một năm.
+2. Chọn base62 sequence, random token hoặc truncated hash cho ba product.
+3. Lập failure table cho cache loss, timeout, expired code, queue outage và hot key.
+4. Chọn 301/302 cho docs, editable link và campaign.
+5. Mở rộng multi-region và nêu write region, uniqueness, replication lag.`,
       },
-      vn: {
-        subject: 'một hệ thống rút gọn URL end-to-end',
-        system: 'dịch vụ read-heavy tạo mapping short code bền vững và resolve với latency thấp',
-        metric: 'availability và p99 server latency của redirect thành công, tách riêng cache hit và storage fallback',
-        invariant: 'mỗi short code active sau normalize chỉ map tới đúng một destination và hai claim đồng thời không thể cùng thành công',
-        artifact: 'capacity sheet, data model, creation sequence, redirect sequence và failure table với operating limit đo được',
-        example: 'tạo link cho campaign rồi truy cập nó trong một đợt traffic viral đột ngột',
-        decision: 'link có mutable và nhạy với analytics đến mức cần 302, hay đủ immutable để hưởng lợi từ response 301 có thể cache',
-        failure: 'một viral code trở thành hot key đúng lúc cache node restart, storage chậm và click-event consumer bị lag',
-        proof: 'concurrency test cho conditional insert, skewed load test, cache-loss drill và redirect latency histogram phải chứng minh uniqueness cùng bounded degradation',
-        why: 'URL shortener đủ nhỏ để phân tích trọn vẹn trong một buổi review nhưng vẫn kết hợp những năng lực system design cốt lõi. User journey nhìn có vẻ đơn giản: tạo short link, truy cập nó, có thể claim alias dễ nhớ và xem usage statistic đến trễ. Phía sau là các lựa chọn cụ thể về API contract, key generation, durable storage, cache freshness, abuse control và asynchronous event. Trước hết cần chốt scope. Edit destination, expiration, preview page, malware review, deletion và multi-region write không phải extension miễn phí; mỗi thứ thay đổi consistency hoặc operational model và có thể là non-goal rõ ràng của release đầu. Workload thường read-heavy nên redirect availability và tail latency quan trọng hơn, còn creation path có thể chịu thêm validation và coordination. Hãy dùng target được nêu ra thay vì phỏng đoán: số creation và redirect mỗi giây, peak-to-average ratio, kích thước URL tối đa, retention, p99 latency, availability, revocation window và xác suất chấp nhận được khi hết collision retry. Các target này quyết định một relational database cộng cache đã đủ hay partition và regional replica thực sự có căn cứ.',
-        mental: 'Tách hệ thống thành write path có chủ đích và read path tối giản. Write path validate destination dùng http hoặc https, authenticate hay phân loại caller, áp dụng creation rate limit, reserve code và persist một authoritative mapping. Read path nhận code đã normalize, tìm mapping, kiểm tra status cùng expiry rồi trả redirect mà không chờ analytics. Dù dùng SQL, hãy model source of truth như quan hệ key-value: `links(short_code PRIMARY KEY, long_url, created_at, owner_id, expires_at, status, code_kind)` và chỉ thêm index cho management query đã cam kết hỗ trợ. `short_code` là generated code hoặc custom alias chính thức; `code_kind` ghi cách nó được cấp mà không tạo namespace thứ hai. Key generation là decision riêng. Base62 biểu diễn reversible một integer đã được cấp bằng alphabet ngắn; đó là encoding chứ không phải encryption, và sequential ID có thể lộ volume hoặc dễ bị enumerate. Random token hay truncated hash tránh central sequence nhưng dùng key space xác suất nên vẫn cần collision handling. Hash destination có thể vô tình áp đặt deduplication semantic và vẫn collide khi bị truncate. Với mọi strategy, database unique constraint hoặc atomic conditional insert mới enforce invariant. Application check rồi insert không làm được việc đó. Custom alias đi vào cùng namespace sau case normalization, Unicode policy, reserved-word check và atomic reservation.',
-        walkthrough: 'Với `POST /links`, validate scheme và length, reject input bị cấm hoặc rõ ràng abusive theo policy, rồi đặt per-account limit cho authenticated creation và per-IP limit cho anonymous creation chặt hơn redirect. Nếu product dùng assigned ID, lấy database sequence hoặc distributed unique integer, encode bằng 62 ký tự `0-9A-Za-z`, sau đó insert mapping. Khi write scale rất cao có thể cấp ID range hoặc dùng distributed ID generator, nhưng phải thừa nhận coordination và information leakage là trade-off thay vì cho rằng base62 tự giải quyết distribution. Với random hoặc hash-derived candidate, thử conditional insert như `INSERT ... ON CONFLICT DO NOTHING`; khi conflict thì tạo candidate khác, retry có giới hạn, ghi metric và fail rõ nếu hết budget. Custom alias bypass encoding nhưng không bypass normalization hay unique constraint; hai claim đồng thời nhận một success và một response 409 conflict rõ ràng. Idempotency key giúp client retry không tạo nhiều link. Với `GET /{short_code}`, edge hoặc load balancer áp dụng abuse limit rộng hơn rồi route tới stateless redirect instance. Service tra distributed cache chứa destination, status và expiry. Khi miss, nó đọc primary hoặc replica có staleness phù hợp với guarantee về activation và revocation, fill cache với TTL có jitter rồi trả 301 hoặc 302. Code không tồn tại có thể negative-cache trong thời gian ngắn. Click data được emit sang durable queue theo best-effort hoặc transactional-outbox policy đã chọn rõ; aggregation, bot filtering và analytics storage nằm ngoài redirect latency path. Scale application instance theo chiều ngang, replicate hot cache entry, coalesce miss, bound database connection và chỉ partition durable mapping bằng stable hash của `short_code` khi storage hoặc throughput đo được thực sự yêu cầu.',
-        pitfalls: 'Redirect status là product decision chứ không phải chi tiết HTTP mang tính trang trí. 301 diễn đạt permanence và có thể cho browser hoặc CDN trả navigation sau mà không gọi service, nhờ đó giảm load và có thể hỗ trợ canonicalization. Chính caching đó lại khiến destination edit cùng abuse revocation nhanh khó hơn, đồng thời làm request-level click analytics đếm thiếu. 302 giữ quyền kiểm soát cho mutable campaign link và làm nhiều visit còn observable, đổi lại service phải nhận nhiều traffic hơn. Cần document cache header cùng status thay vì giả định mọi intermediary hành xử giống nhau. Cache hit ratio riêng không chứng minh safety: một viral code có thể overload một shard, synchronized expiry có thể stampede storage và TTL dài có thể giữ destination đã disable. Dùng request coalescing, TTL jitter, replication hoặc local/edge copy nhỏ cho hot key đã được chứng minh, cùng invalidation hay denylist path có propagation khớp harm window. Đừng gọi token sáu ký tự là secure chỉ vì nhìn random; phải định lượng base62 space, birthday-collision risk, enumeration threat và chi phí typo hay case sensitivity. Không dùng unbounded collision retry hoặc check-then-insert khi claim alias. Tách creation rate limit bảo vệ namespace khan hiếm và abuse-review capacity khỏi redirect limit, nơi block quá mạnh sẽ làm hại legitimate viral traffic. Cuối cùng, asynchronous analytics không đồng nghĩa lossless một cách kỳ diệu: cần định nghĩa event ID, duplicate handling, sampling, queue backpressure, retention, privacy và behavior khi publish fail mà không biến dashboard outage thành redirect downtime.',
-        exercises: [
-          'Ước tính code-space capacity, peak QPS, bandwidth và mapping storage một năm từ traffic profile, retention period và safety margin đã cho.',
-          'Chọn sequential ID cộng base62, random token hoặc truncated hash cho ba product có yêu cầu khác nhau về scale, privacy, coordination và deduplication.',
-          'Hoàn thành redirect failure table cho cache outage, storage timeout, missing code, expired link, disabled link, queue outage và một viral hot key.',
-          'Viết pseudocode collision-safe cho generated code và cho hai custom-alias claim đồng thời bằng unique constraint hoặc conditional insert.',
-          'Chọn 301 hay 302 cho immutable documentation link, editable user link và analytics-sensitive campaign; nêu cả cache header cùng hệ quả revocation.',
-          'Mở rộng design cho regional traffic và nêu region nào nhận write, code giữ unique thế nào, replication lag ảnh hưởng new link ra sao và failover thay đổi guarantee nào.',
-        ],
-      },
-    }),
-    section({
+    },
+    {
       id: 'api-design-versioning',
       title: { en: 'API design & versioning', vn: 'Thiết kế API và versioning' },
       baseline: {
@@ -342,40 +1204,233 @@ export const systemDesign = {
         en: ['Design stable APIs with explicit semantics and limits', 'Evolve schemas through additive compatible changes', 'Specify idempotency, concurrency, and deprecation'],
         vn: ['Thiết kế API ổn định với semantic và limit rõ', 'Evolve schema bằng additive compatible change', 'Đặc tả idempotency, concurrency và deprecation'],
       },
-      en: {
-        subject: 'API design and versioning',
-        system: 'checkout used by web, mobile, and partner clients',
-        metric: 'successful requests by client version and endpoint',
-        invariant: 'retrying one checkout command never creates another order or charge',
-        artifact: 'a versioned contract with examples, errors, limits, and compatibility policy',
-        example: 'submitting checkout and polling the resulting order',
-        decision: 'which semantics remain stable while representations and optional capabilities evolve',
-        failure: 'an old mobile client staying active during a server rollout and schema migration',
-        proof: 'contract tests, compatibility fixtures, adoption metrics, and deprecation telemetry must show safe evolution',
-        why: 'An API is a long-lived agreement between independently deployed software. A clear contract reduces accidental coupling and allows implementation changes without coordinating every release. Checkout APIs also guard correctness and trust: ambiguous retries duplicate money movement, weak error semantics make clients retry permanent failures, and unbounded lists become denial-of-service tools. Versioning is about preserving meaning while clients evolve at different speeds, not merely putting a number in a URL.',
-        mental: 'Design from domain operations and client recovery. Define identity, authorization scope, validation, state preconditions, idempotency, status, machine error code, retryability, and rate limits. Treat schemas as append-only by default. Consumers tolerate unknown response fields; producers do not reinterpret existing fields. Separate behavior versions from deployment versions. Prefer additive evolution and capability negotiation before parallel versions.',
-        walkthrough: 'Create checkout attempts with an idempotency key scoped to account. The same key and equivalent payload returns the original attempt; reuse with a different payload returns conflict. A pending asynchronous payment may return 202 and a durable identifier. Errors include stable code, safe message, request ID, field details, and retry guidance. Use opaque cursor pagination for changing order history, tied to sort and filters. Use entity versions or tags for concurrent cart replacement. Add fields as optional, measure adoption, and support unknown enum values. A breaking semantic change receives a migration guide, observation period, and sunset policy.',
-        pitfalls: 'Do not leak exception text or database structure. HTTP status alone rarely carries enough recovery meaning, but hundreds of error codes also harm clients. Offset pagination is unstable and expensive at scale; timestamps alone collide. Versioning every field fragments operations, while silently changing behavior is worse. Optional inputs need defaults, rate limits need scope and reset behavior, and authentication never replaces resource-level authorization.',
-        exercises: ['Write an idempotent checkout contract covering key scope, payload mismatch, in-progress retry, timeout, response, and errors.', 'Design cursor pagination for orders sorted by creation time and ID while new rows arrive.', 'Plan additive migration from one address string to structured fields across two mobile versions and one partner.'],
+      diagram: 'api-design-versioning',
+      body: {
+        en: `## Analysis
+
+An API is a long-lived agreement between independently deployed software. Design it from domain operations and **client recovery**, not from internal tables. For each operation define identity, authorization, validation, state preconditions, idempotency, status, error codes, retryability, and limits.
+
+Versioning preserves meaning while clients evolve at different speeds. A number in a URL does not make a contract safe; additive schemas, compatibility tests, adoption telemetry, and a deprecation policy do.
+
+Review the contract from the consumer’s position. A client must know whether to retry, wait, refresh state, correct input, or ask a user for action. Ambiguous success and generic errors force clients to guess, and those guesses become distributed behavior that is difficult to change later safely.
+
+## Requirements
+
+Document:
+
+- Resource identity and ownership.
+- Authentication and resource-level authorization.
+- Request limits, defaults, and validation.
+- Idempotency scope and retention.
+- Concurrency behavior and state preconditions.
+- Stable machine-readable errors.
+- Pagination order and cursor semantics.
+- Compatibility and sunset policy.
+
+For checkout, retrying one accepted command must not create another order or charge. A timeout leaves an uncertain outcome, so the client needs a durable operation identifier or idempotent replay.
+
+## Features
+
+A useful checkout API may support:
+
+- Create or retrieve a checkout attempt.
+- Observe pending, accepted, declined, or unknown status.
+- Replace a cart conditionally using an entity version.
+- List orders with bounded cursor pagination.
+- Cancel only from legal states.
+- Return safe error detail and a request ID.
+
+Separate authentication from authorization. A valid token identifies a caller; it does not prove that caller owns an order or may perform a transition.
+
+## Tech choices
+
+HTTP resource endpoints suit stable entities; command-style endpoints suit transitions that do not map cleanly to CRUD. Use the protocol semantics consistently:
+
+- 200 for successful retrieval or replayed result.
+- 201 for newly created resources.
+- 202 for durable work still processing.
+- 400/422 for invalid input according to team convention.
+- 409 for idempotency payload mismatch or state conflict.
+- 412 for failed version precondition.
+- 429 with scope and retry guidance.
+
+Prefer additive evolution and capability negotiation before introducing a parallel major version.
+
+## Design
+
+An idempotency key is scoped to caller and operation. Store a canonical request fingerprint and the resulting resource. The same key plus equivalent payload returns the original response; the same key plus different payload returns conflict. Keep records long enough to cover realistic retries.
+
+Errors need a stable code, safe message, request ID, optional field details, and retry guidance. Do not expose exception text or database structure.
+
+For changing lists, use an opaque cursor tied to sort order and filters. Sort by creation time plus unique ID so ties are deterministic. The cursor should not be accepted with different filters.
+
+## Code
+
+~~~http
+POST /v1/checkout-attempts
+Idempotency-Key: 5df0...
+If-Match: "cart-v17"
+Content-Type: application/json
+
+{"cart_id":"c_123","payment_method_id":"pm_456"}
+~~~
+
+~~~json
+{
+  "id": "ca_789",
+  "status": "pending",
+  "poll_after_ms": 1000,
+  "request_id": "req_abc"
+}
+~~~
+
+For errors:
+
+~~~json
+{"code":"idempotency_conflict","message":"Key reused with different input","retryable":false,"request_id":"req_abc"}
+~~~
+
+## Deploy
+
+Treat response schemas as append-only by default. Clients must tolerate unknown response fields, and servers must not reinterpret existing fields. Add enum values carefully: older clients need an “unknown” fallback.
+
+Deploy compatible server readers before new writers. Measure traffic and success by client version, capability, and endpoint. A breaking semantic change needs a migration guide, overlap window, direct owner communication, sunset headers where applicable, and an end condition based on telemetry.
+
+Keep rollback compatible with data written by the new version.
+
+## Trade-offs
+
+- Path versioning is visible but can duplicate operations.
+- Header negotiation keeps URLs stable but is harder to inspect.
+- Strict validation catches errors but can reject harmless future fields.
+- Long idempotency retention costs storage but prevents delayed duplicates.
+- Offset pagination is simple but unstable and expensive on changing large lists.
+- Fine-grained errors help recovery but create a larger client contract.
+
+Version behavior only when semantics truly break; do not version every field.
+
+## Failure modes
+
+- Ambiguous timeout causes duplicate side effects.
+- Reused idempotency key with different payload is accepted.
+- Old mobile clients crash on a new enum.
+- Pagination skips or duplicates items while rows arrive.
+- Authentication is mistaken for authorization.
+- Rate limits omit scope, reset, or retry behavior.
+- Optional input changes default meaning.
+- A server silently changes existing status semantics.
+- Deprecation proceeds without adoption evidence.
+
+Contract tests should replay old fixtures against new servers and new optional fields against tolerant clients.
+
+## Practice
+
+1. Write an idempotent checkout contract for payload mismatch, in-progress retry, timeout, success, and decline.
+2. Design cursor pagination for orders sorted by creation time and ID.
+3. Plan migration from one address string to structured fields across two mobile versions.
+4. Create a compatibility checklist for adding a new payment status.`,
+        vn: `## Phân tích
+
+API là agreement lâu dài giữa software deploy độc lập. Thiết kế từ domain operation và **client recovery**, không từ internal table. Với mỗi operation, định nghĩa identity, authorization, validation, precondition, idempotency, error, retryability và limit.
+
+Versioning giữ meaning khi client evolve khác tốc độ. Số trong URL không đủ; cần additive schema, compatibility test, adoption telemetry và deprecation policy.
+
+## Yêu cầu
+
+- Resource identity và ownership.
+- Authentication cùng resource authorization.
+- Request limit, default, validation.
+- Idempotency scope và retention.
+- Concurrency và state precondition.
+- Stable machine error.
+- Pagination order và cursor.
+- Compatibility và sunset.
+
+Retry checkout không được tạo order hoặc charge thứ hai.
+
+## Tính năng
+
+- Create/retrieve checkout attempt.
+- Observe pending, accepted, declined, unknown.
+- Conditional cart update bằng version.
+- Order list có cursor.
+- Cancel từ legal state.
+- Safe error detail và request ID.
+
+Valid token xác định caller nhưng không chứng minh quyền trên resource.
+
+## Công nghệ
+
+Dùng HTTP semantic nhất quán: 200 cho retrieval/replay, 201 create, 202 durable pending, 409 conflict, 412 failed precondition, 429 có retry guidance. Resource endpoint hợp stable entity; command endpoint hợp transition không tự nhiên là CRUD.
+
+Ưu tiên additive evolution và capability negotiation trước major version mới.
+
+## Thiết kế
+
+Idempotency key scoped theo caller và operation. Lưu canonical request fingerprint cùng result. Cùng key và equivalent payload trả original response; payload khác trả conflict.
+
+Error gồm stable code, safe message, request ID, field detail và retry guidance. Cursor phải opaque, gắn với sort/filter, và dùng timestamp cộng unique ID để tie-break.
+
+## Code
+
+~~~http
+POST /v1/checkout-attempts
+Idempotency-Key: 5df0...
+If-Match: "cart-v17"
+
+{"cart_id":"c_123","payment_method_id":"pm_456"}
+~~~
+
+~~~json
+{"id":"ca_789","status":"pending","poll_after_ms":1000,"request_id":"req_abc"}
+~~~
+
+Error:
+
+~~~json
+{"code":"idempotency_conflict","retryable":false,"request_id":"req_abc"}
+~~~
+
+## Deploy
+
+Xem response schema là append-only. Client chịu unknown field; server không reinterpret field cũ. Old client cần fallback cho unknown enum.
+
+Deploy reader trước writer. Đo traffic/success theo client version. Breaking change cần migration guide, overlap window, sunset signal và end condition theo telemetry. Rollback phải hiểu data do version mới ghi.
+
+## Trade-offs
+
+- Path version rõ nhưng duplicate operation.
+- Header negotiation giữ URL nhưng khó inspect.
+- Strict validation bắt lỗi nhưng có thể reject future field.
+- Idempotency retention dài tốn storage.
+- Offset pagination đơn giản nhưng unstable.
+- Nhiều error code tăng contract surface.
+
+Chỉ version khi semantic thật sự break.
+
+## Phân tích lỗi
+
+- Timeout tạo duplicate effect.
+- Cùng key với payload khác được accept.
+- Old client crash vì enum mới.
+- Pagination skip/duplicate khi row đến.
+- Authentication thay thế authorization.
+- Rate limit thiếu scope/reset.
+- Optional input đổi default.
+- Existing status bị đổi meaning.
+- Deprecation thiếu adoption evidence.
+
+Contract test phải chạy old fixture với new server.
+
+## Practice
+
+1. Viết idempotent checkout contract.
+2. Thiết kế cursor theo creation time và ID.
+3. Lập migration address string sang structured field.
+4. Tạo checklist khi thêm payment status.`,
       },
-      vn: {
-        subject: 'API design và versioning',
-        system: 'checkout được dùng bởi web, mobile và partner client',
-        metric: 'successful request theo client version và endpoint',
-        invariant: 'retry một checkout command không tạo thêm order hoặc charge',
-        artifact: 'versioned contract có example, error, limit và compatibility policy',
-        example: 'submit checkout rồi poll resulting order',
-        decision: 'semantic nào giữ stable khi representation và optional capability evolve',
-        failure: 'mobile client cũ còn active trong server rollout và schema migration',
-        proof: 'contract test, compatibility fixture, adoption metric và deprecation telemetry phải cho thấy safe evolution',
-        why: 'API là agreement sống lâu giữa software deploy độc lập. Contract rõ giảm accidental coupling và cho phép đổi implementation mà không coordinate mọi release. Checkout API còn bảo vệ correctness và trust: retry mơ hồ duplicate money movement, error semantic yếu làm client retry permanent failure, list không bound thành denial-of-service tool. Versioning là giữ meaning khi client evolve với tốc độ khác nhau, không chỉ đặt số trong URL.',
-        mental: 'Thiết kế từ domain operation và client recovery. Định nghĩa identity, authorization scope, validation, state precondition, idempotency, status, machine error code, retryability và rate limit. Xem schema là append-only mặc định. Consumer chịu unknown response field; producer không reinterpret field cũ. Tách behavior version khỏi deployment version. Ưu tiên additive evolution và capability negotiation trước parallel version.',
-        walkthrough: 'Tạo checkout attempt với idempotency key scoped theo account. Cùng key và equivalent payload trả original attempt; reuse với payload khác trả conflict. Pending async payment có thể trả 202 và durable identifier. Error gồm stable code, safe message, request ID, field detail và retry guidance. Dùng opaque cursor pagination cho order history đang đổi, gắn với sort và filter. Dùng entity version hoặc tag cho concurrent cart replacement. Thêm field dạng optional, đo adoption và hỗ trợ unknown enum value. Breaking semantic change có migration guide, observation period và sunset policy.',
-        pitfalls: 'Đừng leak exception text hoặc database structure. HTTP status riêng hiếm khi đủ recovery meaning, nhưng hàng trăm error code cũng hại client. Offset pagination unstable và expensive ở scale; timestamp riêng có thể collide. Version mọi field làm fragmentation, còn âm thầm đổi behavior tệ hơn. Optional input cần default, rate limit cần scope và reset behavior, còn authentication không thay resource-level authorization.',
-        exercises: ['Viết idempotent checkout contract gồm key scope, payload mismatch, in-progress retry, timeout, response và error.', 'Thiết kế cursor pagination cho order sort theo creation time và ID khi row mới tới.', 'Lập additive migration từ một address string sang structured field qua hai mobile version và một partner.'],
-      },
-    }),
-    section({
+    },
+    {
       id: 'services-queues-async',
       title: { en: 'Services, queues, async', vn: 'Service, queue và xử lý bất đồng bộ' },
       baseline: {
@@ -386,40 +1441,220 @@ export const systemDesign = {
         en: ['Choose service boundaries from ownership and invariants', 'Design workflows for duplicates and reordering', 'Apply backpressure, bounded retries, and repair'],
         vn: ['Chọn service boundary từ ownership và invariant', 'Thiết kế workflow cho duplicate và reorder', 'Áp dụng backpressure, bounded retry và repair'],
       },
-      en: {
-        subject: 'service boundaries, queues, and asynchronous work',
-        system: 'checkout from order acceptance through fulfillment',
-        metric: 'end-to-end completion time and oldest queue age',
-        invariant: 'accepted work is durable, repeatable, and visible when downstream services are unavailable',
-        artifact: 'a workflow state model with message contracts, retry policy, and owner per step',
-        example: 'confirming an order, reserving stock, sending email, and starting fulfillment',
-        decision: 'which work belongs in synchronous acceptance and which completes later',
-        failure: 'duplicate delivery, reordered events, poison messages, consumer lag, or downstream outage',
-        proof: 'queue age, reconciliation, duplicate suppression, and replay drills must show work is not lost or permanently stuck',
-        why: 'Asynchrony decouples response time and availability from downstream work, but replaces a call stack with a distributed state machine. Checkout can acknowledge a durable order before email, analytics, and fulfillment finish. It becomes dangerous when a design assumes exactly-once delivery or reports success before preserving enough state to complete. Service boundaries similarly trade independent ownership and scale for network failure and harder cross-service invariants.',
-        mental: 'Separate acceptance from completion. Acceptance validates, protects critical invariants, durably records intent, and returns an identifier. Completion advances explicit states through messages or scheduled work. Assume at-least-once delivery: consumers are idempotent, messages may delay or reorder, and acknowledgement follows durable effects. A queue is a finite buffer. Track arrival rate, service rate, backlog, oldest age, retry volume, and poison count. Draw service boundaries around cohesive data and ownership, not every noun.',
-        walkthrough: 'Synchronously deduplicate checkout, validate policy, create order intent, and commit an outbox message. Publish events with event ID, aggregate ID, version, time, and schema version. Inventory and payment consume idempotently; each result advances guarded order state rather than editing another database. Email and analytics may lag. Set bounded visibility timeout, exponential backoff with jitter, and dead-letter ownership for permanent failures. Limit consumer concurrency and shed low-value work when age exceeds the product window. Provide replay tooling and reconcile order, payment, inventory, and fulfillment records.',
-        pitfalls: 'A queue guarantees broker behavior, not business completion. Exactly-once claims usually hide deduplication or narrow transactional scope. Ordering is commonly per partition, making the key a correctness and load decision. Infinite retries amplify outages; ownerless dead-letter queues become graveyards. Too many services turn local transactions into distributed workflows, while one service shared by unrelated teams blocks change. Choose current boundaries from ownership and invariants, then split with evidence.',
-        exercises: ['Draw checkout acceptance and completion with durable points, message IDs, idempotency, acknowledgements, and user states.', 'Design different retry and dead-letter policies for email, payment timeout, invalid inventory event, and analytics outage.', 'For 500 messages per second and 40 per consumer, calculate concurrency and describe overload at twice peak.'],
+      diagram: 'services-queues-async',
+      body: {
+        en: `## Analysis
+
+Asynchrony separates **acceptance** from **completion**. It can keep a request fast and available while downstream work continues, but it replaces a call stack with a distributed state machine. A queue does not remove failure; it stores work while rate, retries, ordering, and ownership are managed.
+
+Choose service boundaries around cohesive data, invariants, and team ownership. Splitting every noun into a service turns local transactions into network workflows without creating useful autonomy.
+
+## Requirements
+
+For each workflow define:
+
+- What must complete before the user receives success.
+- Where intent becomes durable.
+- Delivery guarantee and ordering scope.
+- Idempotency key and duplicate behavior.
+- Retry limit, backoff, and dead-letter owner.
+- Maximum queue age and end-to-end completion time.
+- Replay, reconciliation, and cancellation semantics.
+
+Assume **at-least-once delivery** unless a narrower transaction proves otherwise. Consumers may see duplicates, delays, and reorderings.
+
+## Features
+
+Checkout acceptance can synchronously validate policy, deduplicate the request, create an order intent, and commit an outbox event. Payment, reservation, fulfillment, email, and analytics may then advance explicit states.
+
+Each message should include event ID, aggregate ID, aggregate version, occurrence time, producer, and schema version. Consumers acknowledge only after durable effects. User-facing status must distinguish accepted work from completed work; “success” cannot mean “queued somewhere” unless the product explicitly defines it that way.
+
+## Tech choices
+
+Use a direct synchronous call when the caller needs an immediate answer and the dependency fits the deadline. Use a queue when work can finish later, needs burst buffering, or must survive downstream outage.
+
+A queue is a **finite buffer**, not unlimited capacity. Select partition keys for both ordering and load. Ordering by order ID supports one order’s sequence; ordering every event globally destroys parallelism. A managed broker reduces operations but does not decide business retries or idempotency.
+
+Use orchestration when one workflow owner needs visible state and compensation. Choreography can reduce central coupling but becomes hard to trace when many services react implicitly.
+
+## Design
+
+Transactional outbox avoids an unsafe database-plus-broker dual write:
+
+1. Commit domain state and an outbox row in one database transaction.
+2. A publisher reads unpublished rows and sends messages.
+3. Mark or checkpoint publication.
+4. Consumers deduplicate by event or business key.
+5. Reconciliation repairs missing or stuck outcomes.
+
+Track arrival rate, service rate, backlog count, **oldest message age**, retry volume, and poison count. Oldest age maps more directly to user delay than backlog alone.
+
+Apply backpressure by limiting consumer concurrency, pausing low-value producers, rejecting excess work, or degrading optional features.
+
+## Code
+
+~~~sql
+BEGIN;
+INSERT INTO orders(id, status) VALUES (:id, 'accepted');
+INSERT INTO outbox(event_id, aggregate_id, type, payload)
+VALUES (:event_id, :id, 'order.accepted', :payload);
+COMMIT;
+~~~
+
+Idempotent consumer:
+
+~~~sql
+BEGIN;
+INSERT INTO processed_events(consumer, event_id)
+VALUES ('inventory', :event_id)
+ON CONFLICT DO NOTHING;
+-- Continue only when one row was inserted.
+UPDATE orders SET inventory_status = :status
+WHERE id = :order_id AND version = :expected_version;
+COMMIT;
+~~~
+
+The deduplication record and side effect must share a transaction when possible.
+
+## Deploy
+
+Deploy consumers that understand a new optional field before producers send it. Keep message changes additive and retain schema fixtures. During a consumer rollout, both versions may process messages, so idempotency must not depend on instance memory.
+
+Canary by partition or consumer group, monitor age and error class, and keep a fast pause mechanism. Size visibility timeout above normal processing but below the recovery objective. Test replay with production-like volume and verify it does not overwhelm dependencies.
+
+## Trade-offs
+
+- Async work improves request isolation but adds delayed failure and status complexity.
+- More partitions increase throughput but weaken ordering scope.
+- Larger batches improve efficiency but increase latency and replay size.
+- Long retries may recover transient faults but block newer work.
+- Dead-lettering preserves progress but creates operator repair work.
+- More services increase deployment autonomy while multiplying network and data consistency concerns.
+
+Choose boundaries and queues for current evidence, not hypothetical scale.
+
+## Failure modes
+
+- Duplicate delivery repeats a non-idempotent side effect.
+- Reordered events move an aggregate backward.
+- Poison messages retry forever.
+- A consumer acknowledges before persisting its effect.
+- Outbox publication stops while API traffic remains healthy.
+- A dead-letter queue has no owner or re-drive policy.
+- Retry traffic overwhelms a recovering dependency.
+- One partition key becomes hot.
+- Schema changes break old consumers.
+
+Bound retries with exponential backoff and jitter. Classify permanent validation errors separately from transient dependency failures. Reconcile authoritative systems instead of trusting queue emptiness.
+
+## Practice
+
+1. Draw checkout acceptance and completion with durable points, acknowledgements, and user-visible states.
+2. Design retry policies for email, payment timeout, invalid inventory event, and analytics outage.
+3. At 500 messages/s and 40 messages/s per consumer, calculate required concurrency plus failure headroom.
+4. Design a replay that processes one week of events without harming live traffic.`,
+        vn: `## Phân tích
+
+Asynchrony tách **acceptance** khỏi **completion**. Nó giữ request nhanh khi downstream work tiếp tục, nhưng thay call stack bằng distributed state machine. Queue lưu work; nó không loại failure.
+
+Chọn service boundary quanh cohesive data, invariant và ownership. Tách mọi noun thành service sẽ biến local transaction thành network workflow.
+
+## Yêu cầu
+
+- Work nào phải xong trước success.
+- Intent durable ở đâu.
+- Delivery guarantee và ordering scope.
+- Idempotency và duplicate behavior.
+- Retry, backoff, dead-letter owner.
+- Maximum queue age và completion time.
+- Replay, reconciliation, cancellation.
+
+Mặc định **at-least-once**: consumer có thể nhận duplicate, delay và reorder.
+
+## Tính năng
+
+Checkout acceptance synchronously validate, deduplicate, create order intent và commit outbox. Payment, inventory, fulfillment, email, analytics advance state sau.
+
+Message gồm event ID, aggregate ID/version, time, producer, schema version. Consumer chỉ acknowledge sau durable effect. User status phải tách accepted khỏi completed.
+
+## Công nghệ
+
+Synchronous call khi caller cần answer ngay. Queue khi work có thể hoàn tất sau, cần buffer burst hoặc sống qua downstream outage.
+
+Queue là **finite buffer**. Partition key quyết định ordering lẫn load. Order ID giữ sequence của một order; global ordering phá parallelism. Orchestration cho workflow owner rõ; choreography giảm central coupling nhưng khó trace.
+
+## Thiết kế
+
+Transactional outbox:
+
+1. Commit domain state và outbox row cùng transaction.
+2. Publisher gửi unpublished row.
+3. Checkpoint publication.
+4. Consumer deduplicate.
+5. Reconciliation repair missing outcome.
+
+Track arrival rate, service rate, backlog, **oldest age**, retry và poison count. Apply backpressure bằng limit concurrency, pause low-value producer hoặc reject excess work.
+
+## Code
+
+~~~sql
+BEGIN;
+INSERT INTO orders(id, status) VALUES (:id, 'accepted');
+INSERT INTO outbox(event_id, aggregate_id, type, payload)
+VALUES (:event_id, :id, 'order.accepted', :payload);
+COMMIT;
+~~~
+
+~~~sql
+BEGIN;
+INSERT INTO processed_events(consumer, event_id)
+VALUES ('inventory', :event_id)
+ON CONFLICT DO NOTHING;
+UPDATE orders SET inventory_status = :status
+WHERE id = :order_id AND version = :expected_version;
+COMMIT;
+~~~
+
+Dedup record và side effect nên cùng transaction.
+
+## Deploy
+
+Deploy consumer hiểu optional field trước producer. Giữ schema additive. Hai consumer version có thể cùng chạy nên không dùng in-memory dedup.
+
+Canary theo partition/group, monitor age/error, có pause nhanh. Test replay ở production-like volume mà không làm hại live traffic.
+
+## Trade-offs
+
+- Async tăng isolation nhưng failure xuất hiện trễ.
+- Nhiều partition tăng throughput, giảm ordering scope.
+- Batch lớn hiệu quả nhưng tăng latency.
+- Retry dài block work mới.
+- Dead-letter giữ progress nhưng tạo repair.
+- Nhiều service tăng autonomy và network concern.
+
+## Phân tích lỗi
+
+- Duplicate lặp non-idempotent effect.
+- Reorder làm aggregate lùi state.
+- Poison message retry vô hạn.
+- Acknowledge trước persist.
+- Outbox publisher dừng.
+- Dead-letter không owner.
+- Retry overload dependency.
+- Hot partition.
+- Schema break old consumer.
+
+Dùng bounded retry, backoff có jitter, tách permanent khỏi transient error và reconcile source of truth.
+
+## Practice
+
+1. Vẽ checkout acceptance/completion.
+2. Thiết kế retry cho email, payment, invalid event, analytics.
+3. Tính concurrency cho 500 message/s ở 40 message/s mỗi consumer.
+4. Thiết kế replay một tuần không hại live traffic.`,
       },
-      vn: {
-        subject: 'service boundary, queue và asynchronous work',
-        system: 'checkout từ order acceptance tới fulfillment',
-        metric: 'end-to-end completion time và oldest queue age',
-        invariant: 'accepted work durable, repeatable và visible khi downstream service unavailable',
-        artifact: 'workflow state model có message contract, retry policy và owner theo step',
-        example: 'confirm order, reserve stock, gửi email và start fulfillment',
-        decision: 'work nào thuộc synchronous acceptance và work nào complete sau',
-        failure: 'duplicate delivery, reordered event, poison message, consumer lag hoặc downstream outage',
-        proof: 'queue age, reconciliation, duplicate suppression và replay drill phải cho thấy work không lost hoặc stuck vĩnh viễn',
-        why: 'Asynchrony tách response time và availability khỏi downstream work, nhưng thay call stack bằng distributed state machine. Checkout có thể acknowledge durable order trước khi email, analytics và fulfillment xong. Nó nguy hiểm khi design giả định exactly-once delivery hoặc report success trước khi preserve đủ state để complete. Service boundary cũng đổi independent ownership và scale lấy network failure cùng cross-service invariant khó hơn.',
-        mental: 'Tách acceptance khỏi completion. Acceptance validate, bảo vệ critical invariant, record intent durable và trả identifier. Completion advance explicit state qua message hoặc scheduled work. Giả định at-least-once delivery: consumer idempotent, message có thể delay hoặc reorder, acknowledgement sau durable effect. Queue là finite buffer. Track arrival rate, service rate, backlog, oldest age, retry volume và poison count. Vẽ service boundary quanh cohesive data và ownership, không phải mọi noun.',
-        walkthrough: 'Synchronously deduplicate checkout, validate policy, tạo order intent và commit outbox message. Publish event có event ID, aggregate ID, version, time và schema version. Inventory và payment consume idempotently; mỗi result advance guarded order state thay vì edit database khác. Email và analytics có thể lag. Đặt bounded visibility timeout, exponential backoff có jitter và dead-letter ownership cho permanent failure. Limit consumer concurrency và shed low-value work khi age vượt product window. Cung cấp replay tooling và reconcile order, payment, inventory, fulfillment record.',
-        pitfalls: 'Queue guarantee broker behavior chứ không business completion. Exactly-once claim thường giấu deduplication hoặc narrow transactional scope. Ordering thường theo partition nên key là decision correctness lẫn load. Infinite retry amplify outage; dead-letter queue không owner thành graveyard. Quá nhiều service biến local transaction thành distributed workflow, còn một service dùng chung bởi team không liên quan chặn change. Chọn current boundary từ ownership và invariant rồi split bằng evidence.',
-        exercises: ['Vẽ checkout acceptance và completion với durable point, message ID, idempotency, acknowledgement và user state.', 'Thiết kế retry và dead-letter policy khác nhau cho email, payment timeout, invalid inventory event và analytics outage.', 'Với 500 message mỗi giây và 40 mỗi consumer, tính concurrency và mô tả overload ở gấp đôi peak.'],
-      },
-    }),
-    section({
+    },
+    {
       id: 'load-balancing-scale',
       title: { en: 'Load balancing & horizontal scale', vn: 'Load balancing và horizontal scale' },
       baseline: {
@@ -430,40 +1665,215 @@ export const systemDesign = {
         en: ['Design balanced paths and autoscaling signals', 'Handle hot partitions, connection limits, and traffic shifts', 'Scale stateful dependencies with partition strategy'],
         vn: ['Thiết kế balanced path và autoscaling signal', 'Xử lý hot partition, connection limit và traffic shift', 'Scale stateful dependency bằng partition strategy'],
       },
-      en: {
-        subject: 'load balancing and horizontal scale',
-        system: 'a globally read-heavy URL redirect service',
-        metric: 'per-zone saturation, tail latency, and rejected load',
-        invariant: 'traffic reaches only instances able to serve it within deadline',
-        artifact: 'a traffic-flow diagram with capacity units, health semantics, and scaling thresholds',
-        example: 'routing a burst of redirects for a viral short code',
-        decision: 'where to distribute traffic and where to partition state',
-        failure: 'zone loss, slow instance, connection storm, hot key, or autoscaling oscillation',
-        proof: 'zonal load tests and controlled traffic shifts must show even utilization, bounded overload, and predictable recovery',
-        why: 'Horizontal scale works when independent workers process units without a shared bottleneck. A load balancer distributes work, but it cannot create database connections, remove hot keys, or erase stateful sessions. Redirect traffic is easy to replicate at the service layer, while cache and storage partitions need care. The full request path must scale, not only the first tier in a diagram.',
-        mental: 'Follow traffic from global entry through region, zone, instance, cache shard, and storage partition. Define balancing key, algorithm, health, capacity, and failure scope at each layer. Round robin suits similar work; least outstanding helps variable service time; consistent hashing improves locality but may concentrate hot keys. Keep app instances stateless. Scale on the constrained resource and queueing signal rather than CPU by habit.',
-        walkthrough: 'Route users to healthy regions, then spread traffic across zones with enough spare capacity for one-zone loss. Readiness waits for configuration and critical dependencies; liveness detects unrecoverable process state. Do not fail readiness for every optional dependency. Drain connections during deploy and align deadlines. Make redirect instances disposable. Replicate extremely hot mappings at edge or locally. Bound total database connections across all instances. Autoscale from concurrency, queue delay, latency, and saturation with warm-up and conservative scale-down. Pre-scale campaigns. Partition storage only with stable routing and a rebalancing plan.',
-        pitfalls: 'Shallow health sends traffic to broken instances; dependency-heavy health can remove the whole fleet. Sticky sessions hide state and skew load. Autoscaling arrives after traffic and may worsen connection storms. More instances can reduce capacity if each opens large pools or warms identical data. Consistent hashing reduces movement, not popularity. Random load tests miss skew. Reserve headroom for failure and deployment, not only normal peak.',
-        exercises: ['Design a complete global redirect path with algorithm, health signal, timeout, and capacity at each layer.', 'Size a fleet for 20,000 peak requests per second at 400 per instance, including one-zone loss across three zones.', 'Diagnose why adding instances raises database latency using connection-pool arithmetic.'],
+      diagram: 'load-balancing-scale',
+      body: {
+        en: `## Analysis
+
+Horizontal scale works when independent workers can process units without a shared bottleneck. A load balancer distributes traffic; it cannot create database capacity, erase stateful sessions, or fix a hot key. Follow the complete path from global entry through region, zone, instance, cache shard, database connection, and storage partition.
+
+For each layer, name the balancing key, algorithm, health meaning, capacity unit, and failure scope. Reserve headroom for a zone loss and deployments, not only normal peak.
+
+## Requirements
+
+Define:
+
+- Peak request rate and request-cost distribution.
+- Geographic routing and data-residency constraints.
+- Per-zone capacity and tolerated failures.
+- Connection, concurrency, and queue limits.
+- Health-check and drain behavior.
+- Scale-up lead time and scale-down safety.
+- Stateful partition key and rebalancing plan.
+- Overload behavior and rejected-load target.
+
+The invariant is that traffic reaches only an instance that can serve it within the caller’s deadline.
+
+## Features
+
+A global redirect path may include:
+
+- DNS or anycast global routing.
+- Regional load balancing.
+- Zone-aware target distribution.
+- Stateless redirect instances.
+- Distributed and edge caches.
+- Storage replicas or partitions.
+- Autoscaling and scheduled pre-scaling.
+- Connection draining during release.
+
+Keep application instances disposable. Session affinity is justified only by a measured state or locality requirement; otherwise it creates skew and hidden state.
+
+## Tech choices
+
+Round robin works for similar request costs. Least outstanding requests adapts better to variable service time. Weighted algorithms support mixed instance capacity. Consistent hashing improves locality and limits remapping, but **does not solve popularity**; one hot key remains hot.
+
+Readiness means an instance may receive traffic. Liveness means the process cannot recover without restart. Startup checks allow warm-up. Do not fail all readiness because an optional dependency is down, and do not report ready before critical configuration or listeners are usable.
+
+Scale from the constrained resource: concurrency, queue delay, latency, memory, connections, or dependency saturation. CPU alone is often late or irrelevant.
+
+## Design
+
+Size a three-zone fleet for one-zone loss. At 20,000 peak RPS and 400 safe RPS per instance, normal capacity needs 50 instances. To survive one of three equal zones, the remaining two zones must carry all traffic: each zone needs 25 instances, so deploy at least 75 total before rollout and safety margin.
+
+Bound database pools globally:
+
+~~~text
+total possible DB connections =
+  regions × zones × instances per zone × pool size
+~~~
+
+If storage allows 600 connections and 75 instances run, a pool of 20 would request 1,500 connections. Use smaller pools, a proxy, or explicit concurrency. More application instances can otherwise reduce total capacity.
+
+## Code
+
+Health endpoints should be narrow:
+
+~~~js
+app.get("/live", (_req, res) => {
+  res.sendStatus(processIsRecoverable() ? 200 : 500);
+});
+
+app.get("/ready", (_req, res) => {
+  const ready = configLoaded() && listenerReady() && !draining();
+  res.sendStatus(ready ? 200 : 503);
+});
+~~~
+
+Dependency health belongs in metrics and traffic policy unless every request truly requires it. During drain, stop new traffic, allow bounded in-flight completion, then terminate.
+
+## Deploy
+
+Use gradual traffic shifts and verify per-zone saturation, p99 latency, errors, and rejected load. Set minimum capacity before rollout so autoscaling does not compete with a deployment. Respect warm-up; newly started instances may load code, establish pools, and fill caches.
+
+Test a zone evacuation, slow instance, connection storm, and cache restart. Pre-scale announced campaigns. Autoscaling needs stabilization windows and conservative scale-down to avoid oscillation.
+
+Partition state only with a routing and migration plan. Dual-read or forwarding strategies can support rebalancing, but every transition needs observability and rollback.
+
+## Trade-offs
+
+- More spare capacity costs money but absorbs failure and rollout.
+- Least-outstanding improves variable work distribution but needs current state.
+- Consistent hashing increases locality but can worsen hot-key concentration.
+- Sticky sessions simplify local state but reduce flexibility and balance.
+- Fast scale-down saves cost but drops warm capacity and connections.
+- Active-active regions improve latency but complicate data consistency.
+
+Scale the bottleneck, not the most visible tier.
+
+## Failure modes
+
+- Shallow health sends traffic to broken targets.
+- Dependency-heavy health removes the whole fleet.
+- Autoscaling arrives after a sudden burst.
+- Every new instance opens a large database pool.
+- One zone or partition receives skewed traffic.
+- Retry traffic hides true arrival rate.
+- Scale-down terminates long requests.
+- A bad control-plane change shifts all traffic at once.
+- Uniform load tests miss viral keys and expensive requests.
+
+Use load shedding, bounded queues, circuit breaking, hot-key replication, and capacity isolation. Record rejected work explicitly.
+
+## Practice
+
+1. Design a global redirect path with algorithm, health, timeout, and capacity at each layer.
+2. Size a fleet for 20,000 peak RPS at 400 RPS per instance with one-zone loss.
+3. Diagnose rising database latency after adding instances using pool arithmetic.
+4. Plan a storage rebalancing operation with live traffic and rollback.`,
+        vn: `## Phân tích
+
+Horizontal scale hoạt động khi independent worker xử lý unit mà không có shared bottleneck. Load balancer không tạo database capacity, xóa session state hay sửa hot key. Theo toàn path từ global entry qua region, zone, instance, cache shard, connection và partition.
+
+Mỗi layer cần balancing key, algorithm, health semantic, capacity unit và failure scope. Dành headroom cho zone loss và deploy.
+
+## Yêu cầu
+
+- Peak rate và request-cost distribution.
+- Geographic routing và residency.
+- Per-zone capacity, failure tolerance.
+- Connection, concurrency, queue limit.
+- Health và drain behavior.
+- Scale lead time.
+- Partition key và rebalancing.
+- Overload behavior.
+
+Traffic chỉ được tới instance có thể serve trong deadline.
+
+## Tính năng
+
+Global redirect path gồm global routing, regional LB, zone distribution, stateless instance, cache, storage replica/partition, autoscaling và connection drain.
+
+Giữ instance disposable. Sticky session chỉ dùng khi có state/locality requirement đo được.
+
+## Công nghệ
+
+Round robin hợp request tương tự; least outstanding hợp variable service time; weighted algorithm cho mixed capacity. Consistent hashing tăng locality nhưng **không giải popularity**.
+
+Readiness nghĩa là nhận traffic được; liveness nghĩa process cần restart. Startup check cho warm-up. Scale theo constrained resource như concurrency, queue delay, connection hoặc dependency saturation, không mặc định CPU.
+
+## Thiết kế
+
+20.000 peak RPS, mỗi instance an toàn 400 RPS cần 50 instance. Với ba zone và chịu mất một zone, hai zone còn lại phải gánh hết: mỗi zone cần 25, tổng ít nhất 75 trước safety margin.
+
+~~~text
+total DB connections =
+  regions × zones × instances × pool size
+~~~
+
+75 instance với pool 20 tạo 1.500 connection; nếu database chỉ cho 600 thì thêm instance làm system tệ hơn.
+
+## Code
+
+~~~js
+app.get("/live", (_req, res) => {
+  res.sendStatus(processIsRecoverable() ? 200 : 500);
+});
+app.get("/ready", (_req, res) => {
+  const ready = configLoaded() && listenerReady() && !draining();
+  res.sendStatus(ready ? 200 : 503);
+});
+~~~
+
+Khi drain, dừng new traffic, chờ bounded in-flight rồi terminate.
+
+## Deploy
+
+Shift traffic dần và verify per-zone saturation, p99, error, rejected load. Giữ minimum capacity khi rollout, tính warm-up và dùng conservative scale-down.
+
+Test zone evacuation, slow instance, connection storm, cache restart. Pre-scale known campaign. Partition state chỉ khi có routing, migration, observability và rollback.
+
+## Trade-offs
+
+- Headroom tốn cost nhưng chịu failure.
+- Least-outstanding cần current state.
+- Consistent hash tăng locality nhưng hot key vẫn hot.
+- Sticky session giảm flexibility.
+- Fast scale-down mất warm capacity.
+- Active-active tăng consistency complexity.
+
+## Phân tích lỗi
+
+- Health nông gửi traffic tới broken target.
+- Health quá sâu remove toàn fleet.
+- Autoscaling đến sau burst.
+- New instance mở pool quá lớn.
+- Zone hoặc partition skew.
+- Retry che arrival rate.
+- Scale-down cắt long request.
+- Control-plane change shift toàn traffic.
+- Uniform load test bỏ viral key.
+
+Dùng shedding, bounded queue, circuit breaker, hot-key replication và capacity isolation.
+
+## Practice
+
+1. Thiết kế global redirect path.
+2. Size fleet 20.000 RPS có one-zone loss.
+3. Chẩn đoán database latency bằng pool arithmetic.
+4. Lập rebalancing plan có rollback.`,
       },
-      vn: {
-        subject: 'load balancing và horizontal scale',
-        system: 'global read-heavy URL redirect service',
-        metric: 'per-zone saturation, tail latency và rejected load',
-        invariant: 'traffic chỉ tới instance có thể serve trong deadline',
-        artifact: 'traffic-flow diagram có capacity unit, health semantic và scaling threshold',
-        example: 'route burst redirect cho viral short code',
-        decision: 'distribute traffic ở đâu và partition state ở đâu',
-        failure: 'zone loss, slow instance, connection storm, hot key hoặc autoscaling oscillation',
-        proof: 'zonal load test và controlled traffic shift phải cho even utilization, bounded overload và predictable recovery',
-        why: 'Horizontal scale hoạt động khi worker độc lập process unit mà không có shared bottleneck. Load balancer distribute work nhưng không thể tạo database connection, loại hot key hoặc xóa stateful session. Redirect traffic dễ replicate ở service layer, còn cache và storage partition cần cẩn thận. Toàn request path phải scale, không chỉ tier đầu trên diagram.',
-        mental: 'Theo traffic từ global entry qua region, zone, instance, cache shard và storage partition. Định nghĩa balancing key, algorithm, health, capacity và failure scope ở mỗi layer. Round robin hợp với work tương tự; least outstanding giúp variable service time; consistent hashing tăng locality nhưng có thể tập trung hot key. Giữ app instance stateless. Scale theo constrained resource và queueing signal thay vì mặc định CPU.',
-        walkthrough: 'Route user tới healthy region rồi spread traffic qua zone với đủ spare capacity cho mất một zone. Readiness chờ configuration và critical dependency; liveness phát hiện process state không recover được. Đừng fail readiness vì mọi optional dependency. Drain connection khi deploy và align deadline. Làm redirect instance disposable. Replicate mapping cực hot ở edge hoặc local. Bound tổng database connection qua mọi instance. Autoscale từ concurrency, queue delay, latency và saturation với warm-up cùng conservative scale-down. Pre-scale campaign. Chỉ partition storage khi có stable routing và rebalancing plan.',
-        pitfalls: 'Health nông gửi traffic tới broken instance; health check quá nhiều dependency có thể remove toàn fleet. Sticky session giấu state và làm skew load. Autoscaling tới sau traffic và có thể làm connection storm tệ hơn. Thêm instance có thể giảm capacity nếu mỗi instance mở pool lớn hoặc warm cùng data. Consistent hashing giảm movement chứ không giảm popularity. Random load test bỏ skew. Dành headroom cho failure và deployment, không chỉ normal peak.',
-        exercises: ['Thiết kế complete global redirect path với algorithm, health signal, timeout và capacity ở mỗi layer.', 'Size fleet cho peak 20.000 request mỗi giây ở 400 mỗi instance, gồm mất một zone trong ba zone.', 'Chẩn đoán vì sao thêm instance làm database latency tăng bằng connection-pool arithmetic.'],
-      },
-    }),
-    section({
+    },
+    {
       id: 'reliability-failures',
       title: { en: 'Reliability: retries, idempotency, failure domains', vn: 'Độ tin cậy: retry, idempotency và failure domain' },
       baseline: {
@@ -474,40 +1884,237 @@ export const systemDesign = {
         en: ['Design bounded retries with budgets and jitter', 'Place idempotency at durable side-effect boundaries', 'Use failure domains, degradation, and recovery objectives'],
         vn: ['Thiết kế bounded retry với budget và jitter', 'Đặt idempotency ở durable side-effect boundary', 'Dùng failure domain, degradation và recovery objective'],
       },
-      en: {
-        subject: 'reliability and partial failure',
-        system: 'checkout with an external payment provider',
-        metric: 'successful orders, duplicate effects, and recovery time during dependency failure',
-        invariant: 'an uncertain response never causes an unbounded or duplicate charge',
-        artifact: 'a failure-mode table tied to timeout, retry, idempotency, degradation, and recovery',
-        example: 'losing the response after a provider may have accepted a charge',
-        decision: 'when to retry, query status, compensate, degrade, or request operator review',
-        failure: 'timeout ambiguity, regional partition, retry storm, correlated dependency, or control-plane loss',
-        proof: 'fault injection, reconciliation, and recovery drills must demonstrate bounded impact and restored invariants',
-        why: 'Distributed systems fail partially: a caller times out while a callee succeeds, a zone loses network while processes live, and a dependency becomes slow rather than clearly down. Reliability comes from designing these ambiguous states, not adding retries everywhere. Checkout makes the stakes visible because duplicate or lost effects involve money and trust. It needs deadlines, durable deduplication, isolated failure domains, and recovery for outcomes that cannot be decided online.',
-        mental: 'Treat every remote call as an uncertain state transition. Know the deadline, side effect, idempotency mechanism, retry owner, and outcome-discovery method before calling. Retry only when the operation is idempotent or has not crossed its effect boundary. Use exponential backoff, jitter, maximum attempts, and shared retry budgets so layers do not multiply traffic. Process, host, zone, region, account, and provider are different failure domains; replicas help only when they do not share the likely cause.',
-        walkthrough: 'Create a durable PaymentAttempt and unique provider key before calling. Reuse the key on every attempt. Leave time after provider timeout to persist results. Mark timeout outcomes unknown, then reconcile provider status before another create. Use bounded retry only with provider idempotency. Circuit-break sustained failure, probe recovery carefully, and shed nonessential work. Spread capacity across zones and define RPO and RTO separately for orders, payment evidence, and analytics. Decide whether regional failure stops checkout, uses a single writer, or accepts durable unpaid intent. Drill restore, credentials, routing, and reconciliation.',
-        pitfalls: 'Retries can turn a small failure into overload, especially when client, gateway, service, library, and broker all retry. Timeouts longer than upstream waste work; timeouts too short create false failure. In-memory idempotency dies on restart, and deduplication after the effect is too late. Multi-region labels do not isolate shared identity, control plane, provider, or bad deployment. Backups are not recovery until restored. Compensation is a new business action that can also fail.',
-        exercises: ['Design payment-attempt states for success, decline, timeout, duplicate, provider outage, and reconciliation.', 'Show nested retry amplification in a three-hop path and replace it with one retry owner and budget.', 'Build a checkout failure-domain table for process, zone, region, database, identity, payment provider, and deployment.'],
+      diagram: 'reliability-failures',
+      body: {
+        en: `## Analysis
+
+Distributed systems fail partially. A caller times out while the callee succeeds, a zone loses network while processes remain alive, or a dependency becomes slow instead of clearly down. Reliability comes from designing these **ambiguous states**, not from adding retries everywhere.
+
+Treat each remote call as an uncertain state transition. Before calling, know its deadline, side effect, idempotency mechanism, retry owner, and outcome-discovery method. Define the user-visible degradation when the outcome cannot be decided online.
+
+## Requirements
+
+For every critical journey, specify:
+
+- End-to-end deadline and per-hop timeouts.
+- Idempotency scope, key storage, and retention.
+- Retryable errors, maximum attempts, and shared budget.
+- Failure domains: process, host, zone, region, account, provider, control plane.
+- RPO and RTO for each data class.
+- Degraded modes and admission control.
+- Reconciliation, backup restore, and operator review.
+
+For payment, an uncertain response must never cause an unbounded or duplicate charge. Orders, payment evidence, and analytics may have different recovery objectives.
+
+## Features
+
+Reliability mechanisms include:
+
+- Deadlines propagated from the caller.
+- Exponential backoff with jitter.
+- Durable idempotency at the side-effect boundary.
+- Circuit breaking and cautious recovery probes.
+- Bulkheads for tenants, dependencies, or work classes.
+- Load shedding and bounded queues.
+- Multi-zone placement and tested failover.
+- Reconciliation for unresolved outcomes.
+
+Use each mechanism for a named failure. A circuit breaker is not a substitute for timeouts, and replicas do not help if they share a bad deployment or provider.
+
+## Tech choices
+
+Retry only when the operation is idempotent or has not crossed its effect boundary. Choose one retry owner. If client, gateway, service, SDK, and broker each make three attempts, one request can multiply into hundreds of calls.
+
+Timeouts must fit inside the upstream deadline and leave time to persist the result. A connection timeout, request timeout, and workflow deadline solve different problems. Circuit breakers should open on sustained dependency harm, not ordinary business declines.
+
+Multi-region is useful only when data, identity, routing, control plane, dependencies, and operational access are examined for correlated failure.
+
+## Design
+
+For payment:
+
+1. Create a durable PaymentAttempt with a unique internal and provider idempotency key.
+2. Commit before calling the provider.
+3. Reuse the same provider key on every attempt.
+4. If the response is lost, mark outcome **unknown**.
+5. Query provider status or reconcile before creating another charge.
+6. Advance order state with guarded transitions.
+
+Define states such as created, submitted, succeeded, declined, unknown, and reconciled. A business decline is terminal and should not be retried as an infrastructure failure.
+
+Spread capacity across zones with enough headroom for one-zone loss. Decide whether region failure stops checkout, routes to a single writer, or accepts durable unpaid intent.
+
+## Code
+
+~~~js
+async function charge(attempt, deadline) {
+  for (let n = 0; n < 3; n++) {
+    try {
+      return await provider.charge(attempt.payload, {
+        idempotencyKey: attempt.providerKey,
+        timeout: remaining(deadline) - PERSIST_MARGIN_MS,
+      });
+    } catch (error) {
+      if (!isTransient(error) || n === 2) throw error;
+      await sleep(jitter(100 * 2 ** n));
+    }
+  }
+}
+~~~
+
+In production, the retry budget must also stop when too little deadline remains. Persist an unknown outcome rather than guessing failure.
+
+## Deploy
+
+Use canaries and fault injection to test dependency timeout, zone loss, credential failure, and slow storage. Verify retries remain bounded and that failure does not spread through shared pools.
+
+Backups are not recovery until restored. Run restore drills, measure actual RPO/RTO, verify credentials and routing, and reconcile records afterward. Exercise regional traffic shifts before incidents.
+
+Roll out timeout or retry changes carefully; a small configuration change can multiply load. Observe attempts per original request and retry budget consumption.
+
+## Trade-offs
+
+- Short timeouts protect capacity but create more uncertain outcomes.
+- Retries recover transient faults but amplify overload.
+- More replicas improve availability but increase coordination and stale state.
+- Single-writer regions simplify correctness but increase failover latency.
+- Active-active writes reduce regional latency but require conflict rules.
+- Failing open preserves availability but may violate security or money invariants.
+- Compensation restores business state but is another action that can fail.
+
+Make the product consequence explicit.
+
+## Failure modes
+
+- Nested retries create a storm.
+- In-memory idempotency disappears on restart.
+- Deduplication occurs after the external effect.
+- Timeout exceeds the caller’s remaining deadline.
+- All replicas share a provider, control plane, or bad release.
+- Circuit breaker recovery sends a synchronized surge.
+- Failover promotes stale or incomplete state.
+- Backup restore is too slow or untested.
+- Compensation fails halfway.
+- Operators cannot discover an unknown outcome.
+
+Monitor duplicate-effect count, unknown outcomes, attempts per request, timeout class, breaker state, zonal saturation, and reconciliation age.
+
+## Practice
+
+1. Design payment-attempt states for success, decline, timeout, duplicate, outage, and reconciliation.
+2. Show retry amplification in a three-hop path and replace it with one owner and budget.
+3. Build a failure-domain table for process, zone, region, database, identity, provider, and deployment.
+4. Write a regional recovery drill with exact evidence for restored invariants.`,
+        vn: `## Phân tích
+
+Distributed system hỏng từng phần: caller timeout khi callee success, zone mất network khi process còn sống, dependency slow thay vì down. Reliability đến từ thiết kế **ambiguous state**, không phải thêm retry khắp nơi.
+
+Với mỗi remote call, biết deadline, side effect, idempotency, retry owner và cách discover outcome.
+
+## Yêu cầu
+
+- End-to-end deadline và per-hop timeout.
+- Idempotency scope, storage, retention.
+- Retryable error, max attempt, shared budget.
+- Failure domain: process, zone, region, provider, control plane.
+- RPO/RTO theo data class.
+- Degraded mode và admission control.
+- Reconciliation, restore, operator review.
+
+Uncertain payment không được tạo duplicate hoặc unbounded charge.
+
+## Tính năng
+
+- Propagated deadline.
+- Exponential backoff có jitter.
+- Durable idempotency.
+- Circuit breaker và recovery probe.
+- Bulkhead.
+- Load shedding, bounded queue.
+- Multi-zone placement.
+- Reconciliation.
+
+Mỗi mechanism phải gắn với failure cụ thể.
+
+## Công nghệ
+
+Chỉ retry khi operation idempotent hoặc chưa qua effect boundary. Chọn một retry owner; nhiều layer cùng retry sẽ nhân request.
+
+Timeout phải nằm trong upstream deadline và chừa thời gian persist. Circuit breaker mở vì sustained dependency harm, không vì business decline. Multi-region phải xét shared identity, routing, provider và control plane.
+
+## Thiết kế
+
+Payment flow:
+
+1. Tạo durable PaymentAttempt và provider key unique.
+2. Commit trước provider call.
+3. Reuse key ở mọi attempt.
+4. Mất response thì đánh dấu **unknown**.
+5. Query status hoặc reconcile trước another charge.
+6. Guard order transition.
+
+State có created, submitted, succeeded, declined, unknown, reconciled. Business decline không retry.
+
+## Code
+
+~~~js
+async function charge(attempt, deadline) {
+  for (let n = 0; n < 3; n++) {
+    try {
+      return await provider.charge(attempt.payload, {
+        idempotencyKey: attempt.providerKey,
+        timeout: remaining(deadline) - PERSIST_MARGIN_MS,
+      });
+    } catch (error) {
+      if (!isTransient(error) || n === 2) throw error;
+      await sleep(jitter(100 * 2 ** n));
+    }
+  }
+}
+~~~
+
+Dừng retry nếu deadline không đủ; persist unknown thay vì đoán failure.
+
+## Deploy
+
+Canary và fault injection dependency timeout, zone loss, credential failure, slow storage. Verify retry bounded và pool isolation.
+
+Backup chỉ có giá trị sau restore drill. Đo RPO/RTO thật, verify credential/routing và reconcile. Rollout timeout/retry config chậm vì nó có thể multiply load.
+
+## Trade-offs
+
+- Timeout ngắn bảo vệ capacity nhưng tăng unknown.
+- Retry recover transient fault nhưng amplify overload.
+- Replica tăng availability và stale risk.
+- Single writer đơn giản nhưng failover chậm.
+- Active-active cần conflict rule.
+- Fail-open có thể vi phạm invariant.
+- Compensation cũng có thể fail.
+
+## Phân tích lỗi
+
+- Nested retry storm.
+- In-memory idempotency mất khi restart.
+- Dedup sau external effect.
+- Timeout vượt caller deadline.
+- Replica share same failure.
+- Breaker recovery tạo surge.
+- Failover lên stale state.
+- Restore chưa test.
+- Compensation fail.
+- Unknown outcome không discover được.
+
+Monitor duplicate effect, unknown count, attempts/request, breaker và reconciliation age.
+
+## Practice
+
+1. Thiết kế payment state.
+2. Sửa retry amplification trong path ba hop.
+3. Lập failure-domain table.
+4. Viết regional recovery drill.`,
       },
-      vn: {
-        subject: 'reliability và partial failure',
-        system: 'checkout có external payment provider',
-        metric: 'successful order, duplicate effect và recovery time trong dependency failure',
-        invariant: 'uncertain response không gây unbounded hoặc duplicate charge',
-        artifact: 'failure-mode table nối timeout, retry, idempotency, degradation và recovery',
-        example: 'mất response sau khi provider có thể đã accept charge',
-        decision: 'khi nào retry, query status, compensate, degrade hoặc operator review',
-        failure: 'timeout ambiguity, regional partition, retry storm, correlated dependency hoặc control-plane loss',
-        proof: 'fault injection, reconciliation và recovery drill phải chứng minh bounded impact và restored invariant',
-        why: 'Distributed system hỏng từng phần: caller timeout khi callee thành công, zone mất network khi process còn sống, dependency trở nên chậm thay vì down rõ. Reliability đến từ thiết kế các ambiguous state này, không phải thêm retry khắp nơi. Checkout làm hậu quả rõ vì effect trùng hoặc mất liên quan tiền và trust. Nó cần deadline, durable deduplication, isolated failure domain và recovery cho outcome không thể quyết định online.',
-        mental: 'Xem mọi remote call là uncertain state transition. Biết deadline, side effect, idempotency mechanism, retry owner và outcome-discovery method trước khi call. Chỉ retry khi operation idempotent hoặc chưa qua effect boundary. Dùng exponential backoff, jitter, maximum attempt và shared retry budget để layer không nhân traffic. Process, host, zone, region, account và provider là failure domain khác; replica chỉ giúp khi không share likely cause.',
-        walkthrough: 'Tạo durable PaymentAttempt và unique provider key trước khi call. Reuse key ở mọi attempt. Chừa thời gian sau provider timeout để persist result. Đánh dấu timeout outcome là unknown rồi reconcile provider status trước another create. Chỉ bounded retry khi provider có idempotency. Circuit-break sustained failure, probe recovery cẩn thận và shed nonessential work. Phân capacity qua zone và định nghĩa RPO, RTO riêng cho order, payment evidence và analytics. Quyết định regional failure dừng checkout, dùng single writer hay accept durable unpaid intent. Drill restore, credential, routing và reconciliation.',
-        pitfalls: 'Retry có thể biến failure nhỏ thành overload, nhất là khi client, gateway, service, library và broker cùng retry. Timeout dài hơn upstream lãng phí work; timeout quá ngắn tạo false failure. In-memory idempotency mất khi restart, deduplicate sau effect là quá muộn. Nhãn multi-region không cô lập shared identity, control plane, provider hoặc bad deployment. Backup chưa là recovery tới khi restore. Compensation là business action mới và cũng có thể fail.',
-        exercises: ['Thiết kế payment-attempt state cho success, decline, timeout, duplicate, provider outage và reconciliation.', 'Chỉ ra nested retry amplification trong path ba hop rồi thay bằng một retry owner và budget.', 'Lập checkout failure-domain table cho process, zone, region, database, identity, payment provider và deployment.'],
-      },
-    }),
-    section({
+    },
+    {
       id: 'observability-basics',
       title: { en: 'Observability basics', vn: 'Nền tảng observability' },
       baseline: {
@@ -518,40 +2125,216 @@ export const systemDesign = {
         en: ['Instrument journeys with stable correlation', 'Define SLIs, SLOs, dashboards, and actionable alerts', 'Control cardinality, sampling, retention, and sensitive data'],
         vn: ['Instrument journey với stable correlation', 'Định nghĩa SLI, SLO, dashboard và actionable alert', 'Kiểm soát cardinality, sampling, retention và sensitive data'],
       },
-      en: {
-        subject: 'observability',
-        system: 'checkout spanning API, order, payment, and inventory services',
-        metric: 'the rate and latency of successful user outcomes',
-        invariant: 'operators can detect, localize, and explain material harm without exposing sensitive data',
-        artifact: 'an observability plan linking SLOs to signals, dimensions, dashboards, alerts, and runbooks',
-        example: 'investigating increased checkout timeouts for one payment method',
-        decision: 'which signals are always retained and which are sampled or aggregated',
-        failure: 'high-cardinality labels, missing context, telemetry loss, alert noise, or sensitive-data leakage',
-        proof: 'game-day investigations must reach a defensible cause and affected population using the planned signals',
-        why: 'Observability lets a team ask new questions of a running system without shipping diagnostic code for every incident. It is the ability to connect user impact to path, state, change, and owner, not the number of dashboards. A healthy process can still produce failed payments, stale inventory, or a slow regional journey. Signals also improve design by replacing assumptions about traffic, latency, cache value, retries, and failure frequency with evidence.',
-        mental: 'Start from user outcomes and work inward. Define SLIs, then SLOs with window and population, and use error budget to guide change risk. Metrics summarize and alert; logs explain discrete events; traces show causal timing across boundaries. Correlate with request, workflow, and deployment IDs while excluding high-cardinality values from metric labels. Instrument service RED signals and resource USE signals. Choose each signal for a question, owner, retention, and privacy rule.',
-        walkthrough: 'Define checkout success as a valid submission reaching accepted or declined state, with explicit exclusions. Measure rate, errors, and latency by bounded region, client, payment method, and release dimensions. Carry trace context and request ID; put order and attempt IDs in structured logs, not metric labels. Emit spans for database, queue, and provider calls. Record business counters for accepted orders, unknown payments, deduplication, and reconciliation. Build a journey dashboard and alert on sustained SLO burn. Attach owner and runbook. Sample normal traces while retaining errors and slow traces. Redact tokens, personal data, and payment details at source, and monitor telemetry loss.',
-        pitfalls: 'Unstructured logs are expensive search; user IDs and URLs as metric labels overwhelm monitoring. Infrastructure-only dashboards force responders to reconstruct journeys. CPU alerts miss correctness failure and page teams for harmless work. Careless SLO exclusions hide harm. Traces mislead when sampling or async context breaks. Telemetry has storage, privacy, and attention costs. Never record secrets and hope access control fixes it. Every alert needs an action and owner.',
-        exercises: ['Define two checkout SLIs and one SLO with numerator, denominator, exclusions, window, and target.', 'Design structured events and traces for one checkout with correlation but no sensitive or unbounded metric labels.', 'Create an alert and runbook for rising unknown payment outcomes with trigger, owner, checks, mitigation, and recovery evidence.'],
+      diagram: 'observability-basics',
+      body: {
+        en: `## Analysis
+
+Observability is the ability to connect **user impact** to path, state, change, and owner using signals from a running system. It is not the number of dashboards. Start from a journey outcome and work inward; a healthy process can still produce failed payments or stale inventory.
+
+Metrics summarize trends and support alerts. Logs explain discrete events. Traces show timing and causality across boundaries. Each signal needs a question, bounded dimensions, retention, privacy rule, and owner.
+
+Design signals before an incident, but validate them during realistic failures. The useful test is whether an engineer can identify the affected users, failing dependency, triggering change, and safe mitigation without deploying extra diagnostic code.
+
+## Requirements
+
+Define an SLI with numerator, denominator, population, and exclusions. Then define an SLO with target and window. For checkout:
+
+- Availability: valid submissions reaching accepted or declined.
+- Latency: time from submission to durable user-visible outcome.
+- Correctness: unknown or duplicate payment outcomes.
+- Freshness: age of fulfillment or analytics processing.
+
+Specify telemetry loss monitoring, time synchronization, correlation fields, sampling, retention, and sensitive-data policy. Exclusions must represent requests the service truly does not own, not hide harm.
+
+## Features
+
+Instrument:
+
+- **RED** for services: rate, errors, duration.
+- **USE** for resources: utilization, saturation, errors.
+- Business state: accepted orders, declines, unknown payments, deduplication, reconciliation.
+- Queue state: arrival, completion, oldest age, retry, poison count.
+- Change context: release, region, configuration version, feature flag.
+
+Build a journey dashboard before component dashboards. Link alerts to runbooks and traces. Every page should identify an action an on-call engineer can take.
+
+## Tech choices
+
+Use metric labels only for bounded values such as region, endpoint, status class, payment method category, and release. User IDs, order IDs, raw URLs, and error messages create unbounded cardinality; put them in structured logs or trace attributes with access and retention controls.
+
+Propagate standard trace context across HTTP and messaging. Carry request ID for one synchronous path and workflow or aggregate ID for longer async work. Sample normal traffic, but retain errors and slow traces when feasible. Sampling decisions must be understood when interpreting counts.
+
+## Design
+
+Create a signal plan:
+
+| Question | Signal | Dimensions |
+|---|---|---|
+| Are users completing checkout? | success ratio | region, client |
+| Where is latency spent? | trace spans | service, dependency |
+| Are payments unresolved? | unknown counter/age | provider |
+| Is work falling behind? | oldest queue age | queue, region |
+
+Use SLO burn-rate alerts over multiple windows. A fast burn catches severe incidents; a slower burn catches sustained degradation without paging on brief noise. Infrastructure thresholds are supporting evidence, not the user-impact objective.
+
+## Code
+
+Structured event:
+
+~~~json
+{
+  "event": "payment_attempt_finished",
+  "request_id": "req_123",
+  "trace_id": "4bf92f...",
+  "order_id": "ord_456",
+  "outcome": "unknown",
+  "provider": "provider_a",
+  "duration_ms": 842,
+  "release": "2026.11.18"
+}
+~~~
+
+Order ID is acceptable in protected logs but not as a metric label. Never record card data, access tokens, passwords, full personal addresses, or sensitive query strings.
+
+## Deploy
+
+Ship instrumentation with the feature and verify it in staging and canary. Confirm counters change once per event, trace context survives async boundaries, dashboards show the canary release, and alerts route to the correct owner.
+
+Use schema-compatible telemetry changes. Monitor dropped logs, metric export failures, trace sampling, and collector backlog. Telemetry must not block the production request path; apply bounded buffers and drop policy.
+
+Run a game day where an engineer starts from an alert and identifies cause, affected population, mitigation, and recovery evidence.
+
+## Trade-offs
+
+- More telemetry improves diagnosis but costs storage, CPU, network, privacy review, and attention.
+- High-cardinality data enables precise search but can overwhelm metric systems.
+- Heavy sampling lowers cost but may hide rare failures.
+- Long retention supports trends and investigations but expands privacy exposure.
+- More alerts increase coverage but reduce trust when they are noisy.
+- Client-side signals show full experience but are harder to collect reliably.
+
+Retain evidence according to risk, not “everything forever.”
+
+## Failure modes
+
+- Infrastructure-only dashboards miss user correctness failures.
+- Average latency hides tail behavior.
+- Unstructured logs cannot be joined or searched reliably.
+- Correlation breaks at a queue boundary.
+- Sensitive data leaks into logs or span attributes.
+- High-cardinality labels overload monitoring.
+- Sampling removes the only failed trace.
+- Alert thresholds page on harmless work or miss SLO harm.
+- Telemetry pipeline failure is invisible.
+- A dashboard has no owner or operational question.
+
+Validate signal semantics with fixtures and incident reviews. A misleading metric is worse than a missing one.
+
+## Practice
+
+1. Define two checkout SLIs and one SLO with numerator, denominator, exclusions, window, and target.
+2. Design logs and traces for checkout without sensitive or unbounded metric labels.
+3. Create an alert and runbook for rising unknown payment outcomes.
+4. Audit one dashboard: remove panels that answer no operational question.`,
+        vn: `## Phân tích
+
+Observability nối **user impact** với path, state, change và owner bằng signal từ running system. Nó không phải số dashboard. Bắt đầu từ journey outcome rồi đi vào component.
+
+Metric summarize và alert; log giải thích event; trace cho timing và causality. Mỗi signal cần question, bounded dimension, retention, privacy và owner.
+
+## Yêu cầu
+
+SLI cần numerator, denominator, population, exclusion. SLO cần target và window. Với checkout:
+
+- Availability của valid submission.
+- Latency tới durable outcome.
+- Correctness qua unknown/duplicate payment.
+- Freshness qua work age.
+
+Định nghĩa telemetry loss, correlation, sampling, retention và sensitive-data policy. Exclusion không được che harm.
+
+## Tính năng
+
+- **RED**: rate, error, duration.
+- **USE**: utilization, saturation, error.
+- Business state: accepted, decline, unknown, dedup, reconcile.
+- Queue: arrival, completion, oldest age, retry.
+- Change: release, region, config, flag.
+
+Journey dashboard đứng trước component dashboard. Alert phải có owner, runbook và action.
+
+## Công nghệ
+
+Metric label chỉ dùng bounded value như region, endpoint, status. User ID, order ID, raw URL là high-cardinality; đặt trong protected structured log hoặc trace.
+
+Propagate trace context qua HTTP và message. Request ID cho sync path; workflow ID cho async work. Sample normal traffic nhưng ưu tiên error và slow trace.
+
+## Thiết kế
+
+| Question | Signal | Dimension |
+|---|---|---|
+| Checkout có thành công? | success ratio | region, client |
+| Latency ở đâu? | trace span | dependency |
+| Payment unresolved? | unknown age | provider |
+| Queue có lag? | oldest age | queue |
+
+Dùng multi-window SLO burn alert. Infrastructure threshold là evidence hỗ trợ, không phải user objective.
+
+## Code
+
+~~~json
+{
+  "event": "payment_attempt_finished",
+  "request_id": "req_123",
+  "trace_id": "4bf92f...",
+  "order_id": "ord_456",
+  "outcome": "unknown",
+  "duration_ms": 842,
+  "release": "2026.11.18"
+}
+~~~
+
+Order ID được phép trong protected log nhưng không trong metric label. Không record card data, token, password hoặc address.
+
+## Deploy
+
+Ship instrumentation cùng feature. Verify counter, async trace context, canary dimension và alert routing. Monitor dropped log, exporter failure và collector backlog. Telemetry không được block request.
+
+Chạy game day từ alert tới cause, affected population, mitigation và recovery evidence.
+
+## Trade-offs
+
+- Nhiều telemetry tăng diagnosis và cost.
+- High cardinality tăng precision nhưng overload metric.
+- Sampling giảm cost nhưng che rare failure.
+- Retention dài tăng privacy exposure.
+- Nhiều alert giảm trust khi noisy.
+- Client signal đầy đủ hơn nhưng khó thu.
+
+## Phân tích lỗi
+
+- Infra dashboard bỏ correctness.
+- Average che tail.
+- Unstructured log khó query.
+- Correlation mất ở queue.
+- Sensitive data leak.
+- Cardinality overload.
+- Sampling bỏ failed trace.
+- Alert noisy hoặc miss SLO.
+- Telemetry failure không visible.
+- Dashboard không owner.
+
+Metric sai nghĩa còn nguy hiểm hơn thiếu metric.
+
+## Practice
+
+1. Định nghĩa hai SLI và một SLO checkout.
+2. Thiết kế log/trace không sensitive label.
+3. Tạo alert và runbook cho unknown payment.
+4. Audit dashboard và bỏ panel không có operational question.`,
       },
-      vn: {
-        subject: 'observability',
-        system: 'checkout đi qua API, order, payment và inventory service',
-        metric: 'rate và latency của successful user outcome',
-        invariant: 'operator detect, localize và explain material harm mà không expose sensitive data',
-        artifact: 'observability plan nối SLO với signal, dimension, dashboard, alert và runbook',
-        example: 'investigate checkout timeout tăng cho một payment method',
-        decision: 'signal nào luôn retained và signal nào sampled hoặc aggregated',
-        failure: 'high-cardinality label, missing context, telemetry loss, alert noise hoặc sensitive-data leakage',
-        proof: 'game-day investigation phải đi tới defensible cause và affected population bằng planned signal',
-        why: 'Observability cho team đặt câu hỏi mới với running system mà không ship diagnostic code cho mọi incident. Nó là khả năng nối user impact với path, state, change và owner, không phải số dashboard. Process healthy vẫn có thể tạo failed payment, stale inventory hoặc slow regional journey. Signal còn cải thiện design bằng cách thay assumption về traffic, latency, cache value, retry và failure frequency bằng evidence.',
-        mental: 'Bắt đầu từ user outcome rồi đi vào trong. Định nghĩa SLI, sau đó SLO có window và population, rồi dùng error budget hướng dẫn change risk. Metric summarize và alert; log giải thích discrete event; trace cho causal timing qua boundary. Correlate bằng request, workflow và deployment ID nhưng loại high-cardinality value khỏi metric label. Instrument service RED signal và resource USE signal. Chọn mỗi signal theo question, owner, retention và privacy rule.',
-        walkthrough: 'Định nghĩa checkout success là valid submission tới accepted hoặc declined state, có explicit exclusion. Đo rate, error và latency theo bounded dimension region, client, payment method và release. Truyền trace context và request ID; đặt order và attempt ID trong structured log, không metric label. Emit span cho database, queue và provider call. Ghi business counter cho accepted order, unknown payment, deduplication và reconciliation. Xây journey dashboard và alert trên sustained SLO burn. Gắn owner và runbook. Sample normal trace nhưng retain error cùng slow trace. Redact token, personal data và payment detail tại source, rồi monitor telemetry loss.',
-        pitfalls: 'Unstructured log là search đắt; user ID và URL làm metric label sẽ overwhelm monitoring. Infrastructure-only dashboard bắt responder reconstruct journey. CPU alert bỏ correctness failure và page team vì harmless work. SLO exclusion cẩu thả che harm. Trace gây hiểu sai khi sampling hoặc async context hỏng. Telemetry có storage, privacy và attention cost. Đừng record secret rồi hy vọng access control sửa. Mọi alert cần action và owner.',
-        exercises: ['Định nghĩa hai checkout SLI và một SLO với numerator, denominator, exclusion, window và target.', 'Thiết kế structured event và trace cho một checkout có correlation nhưng không sensitive hoặc unbounded metric label.', 'Tạo alert và runbook cho unknown payment tăng với trigger, owner, check, mitigation và recovery evidence.'],
-      },
-    }),
-    section({
+    },
+    {
       id: 'system-design-capstone',
       title: { en: 'Capstone design review', vn: 'Capstone review thiết kế' },
       baseline: {
@@ -562,38 +2345,237 @@ export const systemDesign = {
         en: ['Lead a structured review with evidence', 'Challenge assumptions, failures, and operating limits', 'Turn findings into decisions and validation work'],
         vn: ['Dẫn structured review bằng evidence', 'Chất vấn assumption, failure và operating limit', 'Biến finding thành decision và validation work'],
       },
-      en: {
-        subject: 'end-to-end design review',
-        system: 'a multi-region checkout platform',
-        metric: 'the complete journey SLO and correctness-exception rate',
-        invariant: 'every component and operational mechanism traces to an approved requirement or demonstrated risk',
-        artifact: 'a review packet covering scope, estimates, diagrams, contracts, failures, observability, rollout, and decisions',
-        example: 'reviewing checkout before implementation and staged launch',
-        decision: 'whether the design is ready, conditionally ready, or blocked on evidence',
-        failure: 'review becoming architecture theater, personal preference, or an unowned concern list',
-        proof: 'the review must produce explicit decisions, owners, validation criteria, and a design that survives scenario walkthroughs',
-        why: 'A capstone review combines requirements, capacity, data, caching, APIs, asynchrony, scale, reliability, and observability into one defensible story. The goal is not the most complicated diagram. It is to find expensive mistakes while change is cheap and create shared understanding across product, engineering, security, and operations. A good review exposes uncertainty, separates launch risk from future optimization, and preserves why the system looks as it does.',
-        mental: 'Review a chain of claims. Requirements justify decisions; estimates size components; contracts connect them; invariants protect correctness; failure analysis defines degradation; signals prove behavior; rollout limits exposure. A broken link is a finding. First verify that the design solves the product problem, then test whether it can be built and operated. Classify feedback as blocker, reliability risk, validation task, optimization, or preference so preference does not silently block delivery.',
-        walkthrough: 'Prepare a packet with actors, journeys, targets, constraints, assumptions, and non-goals; expected and peak estimates; architecture and sequence diagrams; data invariants and migration; API compatibility; reliability table; observability plan; and rollout. Walk a normal checkout, duplicate, payment timeout, tenfold burst, bad deploy, and region failure. Record decisions live with owner and date. Convert critical unknowns into experiments such as inventory-contention benchmarks or payment-reconciliation simulation. End with ready, conditional, or blocked status and exact exit criteria.',
-        pitfalls: 'A presenter can narrate boxes without requirements or invariants; reviewers can demand preferred technology without linking risk. Exhaustive edge cases may bury the few decisions that matter, while happy-path review creates false confidence. Do not solve every concern with another service, queue, or cache. Action items need owners and verification. Security, privacy, migration, rollback, and operator access belong in design. Update the decision when reality invalidates an assumption rather than defending history.',
-        exercises: ['Produce a checkout review packet limited to ten main decisions, with reference detail in an appendix.', 'Run a red-team review injecting duplicate requests, payment timeout, zone loss, hot inventory, telemetry outage, and rollback.', 'Write a final log with three accepted trade-offs, three validation tasks, owners, required evidence, and launch blockers.'],
+      diagram: 'system-design-capstone',
+      body: {
+        en: `## Analysis
+
+An end-to-end review tests a chain of claims: **requirements justify decisions; estimates size components; contracts connect them; invariants protect correctness; failure analysis defines degradation; signals prove behavior; rollout limits exposure**. A broken link is a finding.
+
+The goal is not the most complicated diagram. It is to find expensive mistakes while change is cheap and create shared understanding across product, engineering, security, and operations. Separate launch blockers from future optimization and personal preference.
+
+The presenter should expose uncertainty rather than defend every choice. Reviewers should challenge assumptions with scenarios and evidence, then help convert unresolved risk into a bounded experiment. A review that produces only comments has failed; the output must be explicit decisions, owners, and measurable verification criteria.
+
+## Requirements
+
+Prepare a concise review packet:
+
+- Actors, journeys, scope, non-goals, and owners.
+- Functional requirements and measurable SLOs.
+- Expected, peak, and sensitivity estimates.
+- Constraints, assumptions, and validation status.
+- Data invariants, retention, privacy, and security.
+- Recovery objectives and accepted degradation.
+
+Every component and operational mechanism should trace to an approved requirement or demonstrated risk. Every critical requirement should trace to a component, test, metric, and owner.
+
+## Features
+
+For a multi-region checkout platform, cover:
+
+- Cart and checkout acceptance.
+- Payment and inventory state machines.
+- Order retrieval and fulfillment.
+- Idempotent API and compatibility policy.
+- Durable events and derived projections.
+- Regional routing and failover.
+- Operator repair and reconciliation.
+- Observability, abuse controls, and audit.
+
+Prioritize the few decisions that control correctness or operating cost. Put supporting detail in an appendix rather than burying reviewers.
+
+## Tech choices
+
+For each major technology, state the decision and rejected alternative:
+
+| Decision | Why | Revisit trigger |
+|---|---|---|
+| Relational order source | Transactions and uniqueness | Write limit measured |
+| Transactional outbox | Avoid unsafe dual write | Shared broker transaction available |
+| Single payment writer | Simpler idempotency | Regional RTO missed |
+| Async analytics | Isolate checkout | Billing-grade counts required |
+
+“Use Kubernetes, Kafka, and Redis” is not a design argument. Name the requirement, mechanism, operational cost, and evidence.
+
+## Design
+
+Use three diagrams:
+
+1. **Context**: actors, external systems, trust boundaries.
+2. **Container**: services, stores, queues, regions, source of truth.
+3. **Sequence**: normal and exceptional state transitions.
+
+Walk these scenarios:
+
+- Normal checkout.
+- Duplicate request after client timeout.
+- Provider accepted payment but response was lost.
+- Hot inventory item under a tenfold burst.
+- Zone failure and region failure.
+- Bad deployment with rollback.
+- Queue and telemetry outage.
+
+At every step, identify state read or written, transaction boundary, deadline, idempotency key, authorization decision, and user-visible outcome.
+
+## Code
+
+Capture decisions in a compact record:
+
+~~~yaml
+decision: single-writer payments
+status: accepted
+requirement: no duplicate charge during regional partition
+tradeoff: checkout pauses if writer region is unavailable
+evidence:
+  - provider idempotency contract
+  - failover drill under 15 minutes
+owner: payments-team
+revisit_when: regional RTO exceeds target twice
+~~~
+
+Keep diagrams and records in version control. Update them when evidence invalidates an assumption; do not defend historical decisions after their conditions change.
+
+## Deploy
+
+Review the rollout as part of the design:
+
+- Compatible schema and API sequence.
+- Canary scope and success criteria.
+- Feature flags and configuration ownership.
+- Capacity for deploy plus one-zone loss.
+- Rollback behavior with newly written data.
+- Backfill and reconciliation limits.
+- Security review and operator access.
+
+End with a readiness status: **ready**, **conditionally ready**, or **blocked**. Conditional and blocked states need exact exit evidence, owner, and decision date.
+
+## Trade-offs
+
+Classify review feedback:
+
+- Blocker: violates an approved invariant or requirement.
+- Reliability risk: plausible failure with unacceptable impact.
+- Validation task: critical assumption lacks evidence.
+- Optimization: improves cost or performance after launch.
+- Preference: an alternative without demonstrated risk reduction.
+
+Do not solve every concern by adding a service, cache, queue, or region. Each component adds capacity, security, deployment, on-call, and incident work.
+
+## Failure modes
+
+Review failure modes include:
+
+- Architecture theater: boxes have no requirement or invariant.
+- Happy-path-only walkthrough.
+- Reviewers demand preferred tools without evidence.
+- Exhaustive minor issues hide the critical decisions.
+- Action items lack owner or verification.
+- Security, privacy, migration, rollback, or repair is postponed.
+- A diagram disagrees with API or data contracts.
+- Launch status is vague.
+- Assumptions have no measurement plan.
+
+A review is complete only when findings become decisions, owned validation, or explicitly accepted trade-offs.
+
+## Practice
+
+1. Produce a checkout packet limited to ten major decisions.
+2. Run a red-team review with duplicate requests, payment timeout, zone loss, hot inventory, telemetry outage, and rollback.
+3. Write a final log with three accepted trade-offs, three validation tasks, owners, evidence, and blockers.
+4. Remove one component and explain exactly which requirement becomes harder.`,
+        vn: `## Phân tích
+
+End-to-end review kiểm tra chain: **requirement justify decision; estimate size component; contract nối chúng; invariant giữ correctness; failure định nghĩa degradation; signal prove behavior; rollout limit exposure**.
+
+Mục tiêu không phải diagram phức tạp nhất mà là tìm expensive mistake sớm và tạo shared understanding. Tách launch blocker khỏi future optimization và preference.
+
+## Yêu cầu
+
+Review packet gồm:
+
+- Actor, journey, scope, non-goal, owner.
+- Functional requirement và SLO.
+- Expected, peak, sensitivity estimate.
+- Constraint, assumption, validation.
+- Data invariant, retention, privacy.
+- RPO/RTO và accepted degradation.
+
+Mỗi component phải trace tới requirement/risk; mỗi critical requirement trace tới component, test, metric và owner.
+
+## Tính năng
+
+Multi-region checkout cần cart, acceptance, payment, inventory, order, fulfillment, API compatibility, durable event, failover, repair, observability và audit.
+
+Ưu tiên decision điều khiển correctness hoặc operating cost. Supporting detail để appendix.
+
+## Công nghệ
+
+| Decision | Lý do | Revisit |
+|---|---|---|
+| Relational source | Transaction, uniqueness | Write limit |
+| Outbox | Tránh dual write | Shared transaction |
+| Single payment writer | Idempotency đơn giản | RTO không đạt |
+| Async analytics | Isolate checkout | Billing-grade count |
+
+List technology không phải argument; cần requirement, mechanism, cost và evidence.
+
+## Thiết kế
+
+Dùng context, container và sequence diagram. Walk normal checkout, duplicate, lost payment response, hot inventory, zone/region failure, bad deploy, queue outage.
+
+Ở mỗi step, nêu state, transaction, deadline, idempotency, authorization và user outcome.
+
+## Code
+
+~~~yaml
+decision: single-writer payments
+status: accepted
+requirement: no duplicate charge during partition
+tradeoff: checkout pauses if writer region fails
+owner: payments-team
+revisit_when: regional RTO misses twice
+~~~
+
+Lưu decision trong version control và update khi assumption sai.
+
+## Deploy
+
+- Compatible schema/API sequence.
+- Canary và success criterion.
+- Feature flag ownership.
+- Capacity cho deploy và zone loss.
+- Rollback với new data.
+- Backfill/reconciliation limit.
+- Security và operator access.
+
+Kết thúc bằng **ready**, **conditionally ready** hoặc **blocked**, kèm exit evidence, owner, date.
+
+## Trade-offs
+
+Classify feedback thành blocker, reliability risk, validation task, optimization hoặc preference. Preference không được âm thầm block delivery.
+
+Không giải mọi concern bằng thêm service/cache/queue/region; mỗi component tạo on-call và incident work.
+
+## Phân tích lỗi
+
+- Architecture theater.
+- Chỉ walk happy path.
+- Tool preference thiếu evidence.
+- Minor issue che decision lớn.
+- Action không owner.
+- Hoãn security, migration, rollback.
+- Diagram lệch contract.
+- Launch status mơ hồ.
+- Assumption thiếu measurement.
+
+Review chỉ xong khi finding thành decision, owned validation hoặc accepted trade-off.
+
+## Practice
+
+1. Tạo checkout packet giới hạn mười decision.
+2. Red-team duplicate, timeout, zone loss, hot inventory, telemetry outage và rollback.
+3. Viết final log có trade-off, validation, owner, evidence, blocker.
+4. Bỏ một component và nêu requirement nào khó hơn.`,
       },
-      vn: {
-        subject: 'end-to-end design review',
-        system: 'multi-region checkout platform',
-        metric: 'complete journey SLO và correctness-exception rate',
-        invariant: 'mọi component và operational mechanism trace tới approved requirement hoặc demonstrated risk',
-        artifact: 'review packet gồm scope, estimate, diagram, contract, failure, observability, rollout và decision',
-        example: 'review checkout trước implementation và staged launch',
-        decision: 'design ready, conditionally ready hay blocked vì thiếu evidence',
-        failure: 'review thành architecture theater, personal preference hoặc unowned concern list',
-        proof: 'review phải tạo explicit decision, owner, validation criterion và design vượt qua scenario walkthrough',
-        why: 'Capstone review kết hợp requirement, capacity, data, caching, API, asynchrony, scale, reliability và observability thành một câu chuyện có thể bảo vệ. Mục tiêu không phải diagram phức tạp nhất. Mục tiêu là tìm expensive mistake khi change còn rẻ và tạo shared understanding qua product, engineering, security và operations. Review tốt expose uncertainty, tách launch risk khỏi future optimization và lưu lý do system có hình dạng hiện tại.',
-        mental: 'Review một chain of claim. Requirement justify decision; estimate size component; contract connect chúng; invariant bảo vệ correctness; failure analysis định nghĩa degradation; signal prove behavior; rollout limit exposure. Link hỏng là finding. Trước hết verify design giải product problem, sau đó test nó có thể build và operate không. Classify feedback thành blocker, reliability risk, validation task, optimization hoặc preference để preference không âm thầm block delivery.',
-        walkthrough: 'Chuẩn bị packet có actor, journey, target, constraint, assumption và non-goal; expected và peak estimate; architecture cùng sequence diagram; data invariant và migration; API compatibility; reliability table; observability plan; rollout. Walk normal checkout, duplicate, payment timeout, burst gấp mười, bad deploy và region failure. Record decision trực tiếp có owner và date. Chuyển critical unknown thành experiment như inventory-contention benchmark hoặc payment-reconciliation simulation. Kết thúc bằng ready, conditional hoặc blocked cùng exact exit criterion.',
-        pitfalls: 'Presenter có thể narrate box mà thiếu requirement hoặc invariant; reviewer có thể đòi preferred technology không link risk. Exhaustive edge case có thể chôn vài decision quan trọng, còn happy-path review tạo false confidence. Đừng giải mọi concern bằng thêm service, queue hoặc cache. Action item cần owner và verification. Security, privacy, migration, rollback và operator access thuộc design. Update decision khi reality invalidate assumption thay vì bảo vệ history.',
-        exercises: ['Tạo checkout review packet giới hạn mười main decision, với reference detail trong appendix.', 'Chạy red-team review inject duplicate request, payment timeout, zone loss, hot inventory, telemetry outage và rollback.', 'Viết final log có ba accepted trade-off, ba validation task, owner, required evidence và launch blocker.'],
-      },
-    }),
+    },
   ],
 };
