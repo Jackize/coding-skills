@@ -1,6 +1,6 @@
 # Coding Skills
 
-Bilingual (EN/VN) sample learning site for Design Patterns, System Design, and Docker. Plain HTML, CSS, and JavaScript—no build step.
+Bilingual (EN/VN) sample learning site for Design Patterns, System Design, and Docker. Plain HTML, CSS, and JavaScript—no build step, no login.
 
 ## Run locally
 
@@ -10,7 +10,7 @@ From this directory:
 python3 -m http.server 8080
 ```
 
-Open [http://localhost:8080/](http://localhost:8080/) for the home page.
+Open [http://localhost:8080/](http://localhost:8080/).
 
 ## URL shapes
 
@@ -20,10 +20,35 @@ Open [http://localhost:8080/](http://localhost:8080/) for the home page.
 | Course | `course.html?id=<course-id>` (e.g. `design-patterns`) |
 | Section | `section.html?course=<course-id>&section=<section-id>` |
 
+Course ids: `design-patterns`, `system-design`, `docker`.
+
+## Exports
+
+On each section page you can download:
+
+- **Markdown** (`.md`) — Notion-friendly paste/import
+- **Standalone HTML** — offline reading with inlined styles and diagram
+
 ## GitHub Pages
 
-This repo is a static site. Enable **GitHub Pages** on the `main` branch (root) in repository settings to publish at `https://Jackize.github.io/coding-skills/`.
+Publish from the `main` branch, site root (`/`). Expected URL once enabled:
+
+`https://Jackize.github.io/coding-skills/`
+
+Enable in the repo: **Settings → Pages → Deploy from a branch → `main` / `/` (root)**.
+
+Or via API (needs auth):
+
+```bash
+gh api repos/Jackize/coding-skills/pages -X POST -f build_type=legacy -f source[branch]=main -f source[path]=/
+```
 
 ## Adding content
 
-Later tasks load course and section data from `js/catalog.js`. See the implementation plan in the repo for the content model.
+Edit `js/catalog.js`:
+
+1. Add or update a course under `courses` (`id`, bilingual `title` / `summary`).
+2. Add sections with `id`, `title`, `body` (Markdown), `baseline`, `skills`, and `diagram` (filename stem under `assets/diagrams/`).
+3. Drop a matching SVG at `assets/diagrams/<diagram>.svg`.
+
+UI strings for chrome live in the page bootstraps (`js/app-*.js`) and `js/i18n.js`.
