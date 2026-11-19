@@ -5,7 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Not found — Coding Skills</title>
   <meta http-equiv="refresh" content="0; url=./index.html">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('coding-skills-theme');
+        if (t !== 'light' && t !== 'dark') {
+          t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/foundation.css">
   <script>location.replace('index.html');</script>
 </head>
 <body>

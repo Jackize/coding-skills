@@ -6,7 +6,7 @@ import path from 'path';
 
 const MIN_EN = 400;
 const MAX_EN = 1400;
-const HEADINGS_EN = [
+const DEFAULT_HEADINGS_EN = [
   '## Analysis',
   '## Requirements',
   '## Features',
@@ -32,7 +32,8 @@ for (const course of courses) {
   for (const s of course.sections) {
     const words = s.body.en.trim().split(/\s+/).filter(Boolean).length;
     const vnWords = s.body.vn.trim().split(/\s+/).filter(Boolean).length;
-    const missing = HEADINGS_EN.filter((h) => !s.body.en.includes(h));
+    const headings = s.headings || DEFAULT_HEADINGS_EN;
+    const missing = headings.filter((h) => !s.body.en.includes(h));
     const hasBold = /\*\*[^*]+\*\*/.test(s.body.en);
     const diagram = path.join('assets/diagrams', `${s.diagram}.svg`);
     const hasSvg = fs.existsSync(diagram);

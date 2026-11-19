@@ -4,16 +4,43 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Coding Skills</title>
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('coding-skills-theme');
+        if (t !== 'light' && t !== 'dark') {
+          t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/foundation.css">
 </head>
 <body>
   <header id="site-header" class="site-header">
     <div class="site-header__inner">
       <a class="site-brand" href="index.html">Coding Skills</a>
-      <div class="lang-toggle" role="group" aria-label="Language">
-        <button type="button" class="lang-toggle__btn" data-lang="en">EN</button>
-        <span class="lang-toggle__sep" aria-hidden="true">|</span>
-        <button type="button" class="lang-toggle__btn" data-lang="vn">VN</button>
+      <div class="header-controls">
+        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle theme" aria-pressed="false">
+          <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          </span>
+          <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+          </span>
+        </button>
+        <div class="lang-toggle" role="group" aria-label="Language">
+          <button type="button" class="lang-toggle__btn" data-lang="en">EN</button>
+          <span class="lang-toggle__sep" aria-hidden="true">|</span>
+          <button type="button" class="lang-toggle__btn" data-lang="vn">VN</button>
+        </div>
       </div>
     </div>
   </header>
@@ -25,6 +52,7 @@
       <p class="site-footer__copy">Coding Skills — sample learning docs.</p>
     </div>
   </footer>
+  <script src="js/foundation.js" defer></script>
   <script type="module" src="js/app-home.js"></script>
 </body>
 </html>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" role="img" aria-labelledby="title">
+  <title id="title">SQL tables versus NoSQL documents</title>
+  <rect width="320" height="180" fill="#f8fafc"/>
+  <g font-family="system-ui,sans-serif" font-size="11" text-anchor="middle">
+    <rect x="20" y="30" width="130" height="120" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+    <text x="85" y="50" fill="#1e3a8a" font-weight="600">SQL (relational)</text>
+    <rect x="34" y="60" width="102" height="18" rx="3" fill="#dbeafe"/>
+    <text x="85" y="73" fill="#1e3a8a">id | name | email</text>
+    <rect x="34" y="82" width="102" height="18" rx="3" fill="#fff" stroke="#bfdbfe"/>
+    <text x="85" y="95" fill="#334155">1 | Ana | a@x.io</text>
+    <rect x="34" y="104" width="102" height="18" rx="3" fill="#fff" stroke="#bfdbfe"/>
+    <text x="85" y="117" fill="#334155">2 | Bo  | b@x.io</text>
+    <text x="85" y="140" fill="#475569" font-size="10">schema · ACID · JOIN</text>
+    <rect x="170" y="30" width="130" height="120" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+    <text x="235" y="50" fill="#1e3a8a" font-weight="600">NoSQL (document)</text>
+    <rect x="184" y="60" width="102" height="18" rx="3" fill="#dbeafe"/>
+    <text x="235" y="73" fill="#1e3a8a">{ id, profile }</text>
+    <rect x="184" y="82" width="102" height="18" rx="3" fill="#fff" stroke="#bfdbfe"/>
+    <text x="235" y="95" fill="#334155">friends: [...]</text>
+    <rect x="184" y="104" width="102" height="18" rx="3" fill="#fff" stroke="#bfdbfe"/>
+    <text x="235" y="117" fill="#334155">prefs: { }</text>
+    <text x="235" y="140" fill="#475569" font-size="10">flexible · scale-out</text>
+  </g>
+</svg>

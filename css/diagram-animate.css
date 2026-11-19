@@ -1,0 +1,91 @@
+/* ==========================================================================
+   diagram-animate.css — animate inline SVG diagrams
+   Skill package: "diagram-animate" (S2)
+
+   Keyframes replicate the technique used by algomaster.io: nodes pop in
+   with a scale, edges draw themselves via stroke-dashoffset, and labels
+   fade in with a delay. Elements stay paused until the diagram scrolls into
+   view (the .is-animating class is added by js/diagram-animate.js).
+   ========================================================================== */
+
+@keyframes sd-node-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes sd-edge-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes sd-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.sd-svg .sd-anim-node {
+  animation: sd-node-in 0.45s ease-out both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.sd-svg .sd-anim-edge-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: sd-edge-draw 0.6s ease-out forwards;
+}
+
+.sd-svg .sd-anim-fade {
+  animation: sd-fade-in 0.4s ease-out both;
+}
+
+/* Paused until the diagram enters the viewport. */
+.sd-svg .sd-anim-node,
+.sd-svg .sd-anim-edge-draw,
+.sd-svg .sd-anim-fade {
+  animation-play-state: paused;
+}
+
+.sd-svg.is-animating .sd-anim-node,
+.sd-svg.is-animating .sd-anim-edge-draw,
+.sd-svg.is-animating .sd-anim-fade {
+  animation-play-state: running;
+}
+
+/* --------------------------------------------------------------------------
+   Looping "limitation" animations (run continuously once the SVG is inlined)
+   -------------------------------------------------------------------------- */
+@keyframes sd-loop-pulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.95; }
+}
+
+@keyframes sd-loop-slide {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(var(--sd-slide, 80px)); }
+}
+
+.sd-svg .sd-loop-pulse {
+  animation: sd-loop-pulse 2.4s ease-in-out infinite;
+}
+
+.sd-svg .sd-loop-slide {
+  animation: sd-loop-slide 4.5s ease-in-out infinite;
+}
+
+/* Diagrams embedded inline in the content (per-algorithm illustrations). */
+.inline-diagram {
+  max-width: 100%;
+  margin: 1.5rem 0;
+}
+
+/* Respect users who prefer reduced motion: show diagrams statically. */
+@media (prefers-reduced-motion: reduce) {
+  .sd-svg .sd-anim-node,
+  .sd-svg .sd-anim-edge-draw,
+  .sd-svg .sd-anim-fade,
+  .sd-svg .sd-loop-pulse,
+  .sd-svg .sd-loop-slide {
+    animation: none;
+  }
+}

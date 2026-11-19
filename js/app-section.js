@@ -2,6 +2,7 @@ import { getCatalog } from './catalog.js';
 import { applyStaticI18n, getLang, t } from './i18n.js';
 import { renderMarkdown } from './markdown.js';
 import { downloadHtml, downloadMarkdown } from './export.js';
+import { animateDiagrams } from './diagram-animate.js';
 
 const LABELS = {
   documents: { en: 'Documents', vn: 'Tài liệu' },
@@ -122,4 +123,8 @@ function wireExports() {
 applyStaticI18n();
 render();
 wireExports();
-document.addEventListener('langchange', render);
+animateDiagrams();
+document.addEventListener('langchange', () => {
+  render();
+  animateDiagrams();
+});

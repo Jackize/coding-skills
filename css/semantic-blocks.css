@@ -1,0 +1,360 @@
+/* ==========================================================================
+   semantic-blocks.css — callouts, pros/cons cards, comparison tables
+   Skill package: "semantic-blocks" (S3)
+
+   Renders the containers produced by js/markdown.js:
+     :::note / :::tip / :::warning / :::info  -> .callout
+     :::pros / :::cons                        -> .pc-card (paired in .pros-cons)
+   and markdown tables                        -> .cmp-table
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Semantic colors (light + dark)
+   -------------------------------------------------------------------------- */
+:root {
+  --sb-green-text: #166534;
+  --sb-green-border: #bbf7d0;
+  --sb-green-head: #dcfce7;
+  --sb-green-bg: #f0fdf4;
+  --sb-green-bg-fade: rgba(240, 253, 244, 0.3);
+  --sb-green-dot: #22c55e;
+  --sb-green-icon: #16a34a;
+
+  --sb-red-text: #991b1b;
+  --sb-red-border: #fecaca;
+  --sb-red-head: #fee2e2;
+  --sb-red-bg: #fef2f2;
+  --sb-red-bg-fade: rgba(254, 242, 242, 0.3);
+  --sb-red-dot: #ef4444;
+  --sb-red-icon: #dc2626;
+}
+
+[data-theme="dark"] {
+  --sb-green-text: #bbf7d0;
+  --sb-green-border: rgba(22, 101, 52, 0.6);
+  --sb-green-head: rgba(20, 83, 45, 0.45);
+  --sb-green-bg: rgba(5, 46, 22, 0.4);
+  --sb-green-bg-fade: rgba(5, 46, 22, 0.15);
+  --sb-green-dot: #22c55e;
+  --sb-green-icon: #4ade80;
+
+  --sb-red-text: #fecaca;
+  --sb-red-border: rgba(153, 27, 27, 0.6);
+  --sb-red-head: rgba(127, 29, 29, 0.45);
+  --sb-red-bg: rgba(69, 10, 10, 0.4);
+  --sb-red-bg-fade: rgba(69, 10, 10, 0.15);
+  --sb-red-dot: #ef4444;
+  --sb-red-icon: #f87171;
+}
+
+/* --------------------------------------------------------------------------
+   2. Pros / Cons cards
+   -------------------------------------------------------------------------- */
+.pros-cons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+@media (min-width: 768px) {
+  .pros-cons {
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+  }
+}
+
+.pc-card {
+  border: 1px solid;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  font-size: 0.95rem;
+}
+
+.pc-card--pros {
+  border-color: var(--sb-green-border);
+  background: linear-gradient(180deg, var(--sb-green-bg), var(--sb-green-bg-fade));
+}
+
+.pc-card--cons {
+  border-color: var(--sb-red-border);
+  background: linear-gradient(180deg, var(--sb-red-bg), var(--sb-red-bg-fade));
+}
+
+.pc-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid;
+}
+
+.pc-card--pros .pc-card__head {
+  background: var(--sb-green-head);
+  border-color: var(--sb-green-border);
+}
+
+.pc-card--cons .pc-card__head {
+  background: var(--sb-red-head);
+  border-color: var(--sb-red-border);
+}
+
+.pc-card__icon {
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.pc-card__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.pc-card--pros .pc-card__icon {
+  color: var(--sb-green-icon);
+}
+
+.pc-card--cons .pc-card__icon {
+  color: var(--sb-red-icon);
+}
+
+.pc-card__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.pc-card--pros .pc-card__title {
+  color: var(--sb-green-text);
+}
+
+.pc-card--cons .pc-card__title {
+  color: var(--sb-red-text);
+}
+
+.pc-card__body {
+  padding: 1rem;
+}
+
+.pc-card--pros .pc-card__body {
+  color: var(--sb-green-text);
+}
+
+.pc-card--cons .pc-card__body {
+  color: var(--sb-red-text);
+}
+
+.pc-card__body p {
+  margin: 0 0 0.75rem;
+}
+
+.pc-card__body p:last-child {
+  margin-bottom: 0;
+}
+
+.pc-card__body ul,
+.pc-card__body ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pc-card__body li {
+  position: relative;
+  padding-left: 1.15rem;
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.pc-card__body li:first-child {
+  margin-top: 0;
+}
+
+.pc-card__body li:last-child {
+  margin-bottom: 0;
+}
+
+.pc-card__body li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+}
+
+.pc-card--pros .pc-card__body li::before {
+  background: var(--sb-green-dot);
+}
+
+.pc-card--cons .pc-card__body li::before {
+  background: var(--sb-red-dot);
+}
+
+/* --------------------------------------------------------------------------
+   3. Callouts (note / tip / warning / info)
+   -------------------------------------------------------------------------- */
+.callout {
+  --cc-accent: hsl(var(--primary));
+  --cc-border: hsl(var(--primary) / 0.3);
+  --cc-bg: hsl(var(--primary) / 0.06);
+
+  border: 1px solid var(--cc-border);
+  border-left: 4px solid var(--cc-accent);
+  border-radius: 0.5rem;
+  background: var(--cc-bg);
+  margin: 1.5rem 0;
+  padding: 1rem 1.15rem;
+  font-size: 0.95rem;
+}
+
+.callout--note {
+  --cc-accent: #d97706;
+  --cc-border: rgba(245, 158, 11, 0.4);
+  --cc-bg: rgba(245, 158, 11, 0.08);
+}
+
+.callout--tip {
+  --cc-accent: #16a34a;
+  --cc-border: rgba(34, 197, 94, 0.4);
+  --cc-bg: rgba(34, 197, 94, 0.08);
+}
+
+.callout--warning {
+  --cc-accent: #dc2626;
+  --cc-border: rgba(239, 68, 68, 0.4);
+  --cc-bg: rgba(239, 68, 68, 0.08);
+}
+
+.callout--info {
+  --cc-accent: #2563eb;
+  --cc-border: rgba(59, 130, 246, 0.35);
+  --cc-bg: rgba(59, 130, 246, 0.08);
+}
+
+[data-theme="dark"] .callout--note {
+  --cc-accent: #fbbf24;
+  --cc-border: rgba(251, 191, 36, 0.3);
+  --cc-bg: rgba(251, 191, 36, 0.07);
+}
+
+[data-theme="dark"] .callout--tip {
+  --cc-accent: #4ade80;
+  --cc-border: rgba(34, 197, 94, 0.3);
+  --cc-bg: rgba(34, 197, 94, 0.07);
+}
+
+[data-theme="dark"] .callout--warning {
+  --cc-accent: #f87171;
+  --cc-border: rgba(239, 68, 68, 0.3);
+  --cc-bg: rgba(239, 68, 68, 0.07);
+}
+
+[data-theme="dark"] .callout--info {
+  --cc-accent: #60a5fa;
+  --cc-border: rgba(59, 130, 246, 0.3);
+  --cc-bg: rgba(59, 130, 246, 0.08);
+}
+
+.callout__head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.callout__head:empty {
+  display: none;
+}
+
+.callout__icon {
+  display: inline-flex;
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+  color: var(--cc-accent);
+}
+
+.callout__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.callout__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--cc-accent);
+}
+
+.callout__body {
+  color: var(--color-text);
+}
+
+.callout__body > :first-child {
+  margin-top: 0;
+}
+
+.callout__body > :last-child {
+  margin-bottom: 0;
+}
+
+.callout__body ul,
+.callout__body ol {
+  margin: 0.5rem 0;
+}
+
+.callout__body p {
+  margin: 0.5rem 0;
+}
+
+/* --------------------------------------------------------------------------
+   4. Comparison tables
+   -------------------------------------------------------------------------- */
+.table-wrap {
+  margin: 1.5rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+  overflow-x: auto;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+}
+
+.cmp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.cmp-table thead th {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  text-align: left;
+  font-weight: 600;
+  padding: 0.6rem 0.9rem;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.cmp-table tbody td {
+  padding: 0.6rem 0.9rem;
+  border-top: 1px solid var(--color-border);
+  vertical-align: top;
+  line-height: 1.55;
+}
+
+.cmp-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.cmp-table tbody tr:hover {
+  background: hsl(var(--primary) / 0.08);
+}
+
+.cmp-table tbody tr:first-child td {
+  border-top: none;
+}
